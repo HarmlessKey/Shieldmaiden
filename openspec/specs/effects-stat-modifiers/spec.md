@@ -94,7 +94,10 @@ A numeric sub-effect SHALL count only when:
 
 When the same definition (the same `source` and `source_key`) is on one entity more than
 once, its sub-effects SHALL count for one instance only: the one whose contributions change
-the value most.
+the value most. A definition with `stacking.mode: "independent"` is the exception: every
+instance of it SHALL count, each with its own choices, level and rolled values. This applies
+everywhere the tracker counts a definition once: effective values, d20 roll modifiers,
+damage bonuses, damage modifiers and restrictions.
 
 #### Scenario: Exhaustion rows by level
 - **WHEN** a player has 5e Exhaustion at level 1
@@ -107,6 +110,18 @@ the value most.
 #### Scenario: Different effects stack
 - **WHEN** an entity has two different custom effects, each with `bonus` `ac` 2
 - **THEN** its effective AC is 4 higher
+
+#### Scenario: Strength Drain twice
+- **WHEN** a fighter with Strength 16 is hit twice by a Shadow, and the two Strength Drain instances (`stacking.mode: "independent"`) rolled 3 and 2
+- **THEN** its effective Strength is 11, and the tooltip lists both reductions
+
+#### Scenario: Independent roll penalty
+- **WHEN** an entity has two instances of a custom effect with `stacking.mode: "independent"` and a −1d4 bonus on attack rolls
+- **THEN** its attack rolls subtract two separate d4s
+
+#### Scenario: Doesn't stack is unchanged
+- **WHEN** an entity has two Bless instances from different clerics (no `stacking`)
+- **THEN** its attack rolls add one d4
 
 ### Requirement: Effective values are shown and marked
 
@@ -162,8 +177,9 @@ death from damage SHALL use it. When an entity's effective maximum drops below i
 points (an effect applied, removed or changed level), its current hit points SHALL be set to
 the effective maximum and saved. When an instance is applied whose definition has a `bonus`
 `max_hp` sub-effect with `also_heal`, current hit points SHALL rise by that bonus, up to the
-new effective maximum, and be saved. A transformed entity's transformed hit point pool SHALL
-NOT follow `max_hp` sub-effects.
+new effective maximum, and be saved. The bonus is its value, or its rolled total (Rolled
+values are rolled when the effect is applied) times its multiplier. A transformed entity's
+transformed hit point pool SHALL NOT follow `max_hp` sub-effects.
 
 #### Scenario: Exhaustion halves the maximum
 - **WHEN** a player at 40/40 HP reaches 5e Exhaustion level 4
@@ -175,6 +191,10 @@ NOT follow `max_hp` sub-effects.
 
 #### Scenario: Aid
 - **WHEN** Aid (a `bonus` `max_hp` of 5 with `also_heal`) is applied to a player at 12/30
+- **THEN** its effective maximum is 35 and its HP 17
+
+#### Scenario: Rolled also-heal
+- **WHEN** an effect with a `bonus` `max_hp` roll of 2d4 with `also_heal` is applied to a player at 12/30, and the dice roll 5
 - **THEN** its effective maximum is 35 and its HP 17
 
 #### Scenario: Maximum restored
@@ -517,3 +537,107 @@ bonuses.
 #### Scenario: Search in a bonus drawer
 - **WHEN** the DM types "armor" in the AC drawer's effects search
 - **THEN** only Armor Class Bonus, Armor Class Minimum and Mage Armor are listed
+
+### Requirement: A chosen roll is the sub-effect's roll
+
+A sub-effect with `choice: "roll"` SHALL use the instance's `choices.roll` as its roll. The
+chosen roll is an object like a reminder's damage: `{ dice_count, dice_type, fixed_val }`, with
+dice (a count of 1 to 99 and a die of 2 to 100, given together), a whole fixed value, or both.
+It SHALL replace the roll's `dice_count`, `dice_type`, `fixed_val` and `modifier`; the roll's
+other fields (`damage_type`, `damage_type_choice`, `magical`) and the sub-effect's
+`multiplier` SHALL stay as defined. A fixed value without dice SHALL be a fixed amount. It
+SHALL be used everywhere the tracker uses a sub-effect's roll:
+- stat values (bonus, base, fixed, floor, cap) roll it once when the effect is applied and
+  store the total in `rolled_values`, like a defined roll
+- `damage` and `healing` sub-effects roll it every time they trigger
+- roll bonuses and damage bonuses roll it on every roll they add to
+
+Until a valid roll is chosen, the sub-effect SHALL do nothing. The resolved definition SHALL
+NOT be changed: each instance uses its own choice. An instance or link without a roll but
+with a numeric `choices.value` SHALL use that value as a fixed roll, so instances and links
+made while an effect had a value choice keep working after it switches to a roll choice.
+
+#### Scenario: Damage over time
+- **WHEN** a creature has a custom "Burning" effect (`damage` triggered at the start of its turn, `roll: { damage_type: "fire" }`, `choice: "roll"`) applied with `choices: { roll: { dice_count: 2, dice_type: 6 } }`
+- **THEN** at the start of each of its turns the damage prompt rolls 2d6 fire
+
+#### Scenario: Chosen Strength reduction
+- **WHEN** Weakening Breath (`bonus` `ability_score` Strength, `multiplier: -1`, `choice: "roll"`) is applied with `choices: { roll: { dice_count: 1, dice_type: 6 } }` and rolls 4
+- **THEN** the instance has `rolled_values` 4 and the creature's Strength is 4 lower
+
+#### Scenario: Roll with a fixed value
+- **WHEN** a damage sub-effect with `roll: { dice_count: 1, dice_type: 4, damage_type: "acid" }` and `choice: "roll"` has `choices: { roll: { dice_count: 2, dice_type: 4, fixed_val: 2 } }`
+- **THEN** it rolls 2d4+2 acid
+
+#### Scenario: Only a fixed value
+- **WHEN** the chosen roll is `{ fixed_val: 5 }` on a damage sub-effect
+- **THEN** it deals 5 damage without rolling
+
+#### Scenario: Made with a value choice
+- **WHEN** a creature has a Damage Over Time instance with `choices: { damage_type: "fire", value: "5" }`, and the definition now has `choice: ["damage_type", "roll"]`
+- **THEN** it still takes 5 fire damage at the start of its turns, and a link with `choices: { value: "4" }` on Hit Point Maximum Reduction doesn't ask for a roll
+
+#### Scenario: Two instances, two rolls
+- **WHEN** one creature has Burning with roll 1d4 and another with 3d6
+- **THEN** their damage prompts roll 1d4 and 3d6
+
+### Requirement: Rolled values are rolled when the effect is applied
+
+A numeric sub-effect (`bonus`, `base`, `fixed`, `floor`, `cap`) whose `sub_types` change an
+effective value (any value of "Numeric sub-effects change effective values") SHALL use its
+`roll` as its value when it has dice (`dice_count` and `dice_type`). The roll SHALL be made
+once, when the instance is applied, and its total (dice, `fixed_val` and the `modifier`
+formula, with the caster's and the holder's formula variables) SHALL be stored on the
+instance. Every application path SHALL do this: the Effects drawer, effect links on actions
+and spells, the bonus drawers, and effects applied outside combat. Each target of an
+application SHALL get its own roll.
+
+The stored total SHALL then count as the sub-effect's value everywhere effective values are
+computed. That includes the combining order, so a `multiplier` applies to it and
+`multiplier: -1` makes it a penalty. The stored total SHALL NOT be rolled again when the
+instance changes level, when the encounter is reloaded or when the definition changes.
+
+- A sub-effect with `choice: "value"` SHALL use the chosen value. Nothing is rolled for it.
+- A sub-effect with both a `value` and a roll with dice SHALL use the roll.
+- A sub-effect with a roll but no stored total SHALL contribute nothing and SHALL be listed
+  as not applied ("not rolled"). This covers instances applied before the definition got a
+  roll, and trait effects, which are never applied.
+- `temp_hp` keeps its own grant prompt (Temporary hit points are granted from a prompt) and
+  SHALL NOT be rolled on application.
+
+The apply notice SHALL show each roll with its result and its effect on the value
+("Strength Drain: 1d4 = 3, Strength −3"). The value's tooltip SHALL show the stored amount
+and the roll it came from ("Strength Drain: −3 (1d4)"). Demo and test mode SHALL roll the same
+way without writing (effects-instance-storage).
+
+#### Scenario: Strength Drain
+- **WHEN** an effect with `{ type: "bonus", sub_types: ["ability_score"], abilities: ["strength"], roll: { dice_count: 1, dice_type: 4 }, multiplier: -1 }` is applied to a player with Strength 14, and the d4 rolls 3
+- **THEN** the instance stores the total 3, the player's effective Strength is 11, its Strength modifier is +0, and the notice shows "1d4 = 3"
+
+#### Scenario: Rolled maximum reduction
+- **WHEN** an effect with a `bonus` `max_hp` sub-effect with `roll: { dice_count: 3, dice_type: 6 }` and `multiplier: -1` is applied to an NPC at 40/40 HP, and the dice roll 11
+- **THEN** its effective maximum is 29 and its current HP is set to 29
+
+#### Scenario: Rolled bonus
+- **WHEN** an effect with a `bonus` `ac` sub-effect with `roll: { dice_count: 1, dice_type: 4 }` and no multiplier is applied to a creature with AC 15, and the d4 rolls 2
+- **THEN** its effective AC is 17, with the tooltip "<effect>: +2 (1d4)"
+
+#### Scenario: Each target rolls
+- **WHEN** that Strength Drain effect is applied to two creatures at once
+- **THEN** each instance stores its own roll
+
+#### Scenario: Not rolled again
+- **WHEN** an instance with a stored total of 3 changes level, or the encounter is closed and opened again
+- **THEN** its total is still 3
+
+#### Scenario: Modifier formula
+- **WHEN** an effect with a `bonus` `ac` roll of `{ dice_count: 1, dice_type: 4, modifier: { formula: "caster.wis_mod" } }` is applied by a caster with Wisdom modifier +3, and the d4 rolls 1
+- **THEN** the stored total is 4
+
+#### Scenario: Instance without a roll
+- **WHEN** an instance has no stored total for a sub-effect with a roll
+- **THEN** that sub-effect doesn't change the value and the tooltip lists it as not rolled
+
+#### Scenario: Chosen value wins
+- **WHEN** a sub-effect has both a roll and `choice: "value"`, and is applied with `choices: { value: "-2" }`
+- **THEN** nothing is rolled and the value is −2

@@ -201,6 +201,8 @@ characters). The optional fields SHALL be type-checked:
 - `applied_round`, `rounds_remaining`, `save_dc`, `level`, `charges`, `save_successes`,
   `save_failures`, `immune_until_round` and `temp_hp_granted` are numbers
 - `magical` is a boolean
+- `rolled_values` is a map from a sub-effect key (`sub_` followed by digits, or a sub-effect
+  `id` of at most 100 letters, digits, `_` and `-`) to a number
 
 Any other field on an instance SHALL be rejected. Existing rules for other entity data SHALL
 NOT change.
@@ -224,6 +226,14 @@ NOT change.
 #### Scenario: Magical instance accepted
 - **WHEN** the owner writes a Paralyzed instance with `magical: true`
 - **THEN** the write succeeds, and `magical: "yes"` is rejected
+
+#### Scenario: Rolled values accepted
+- **WHEN** the owner writes an instance with `rolled_values: { sub_0: 3, drain: 2 }`
+- **THEN** the write succeeds
+
+#### Scenario: Invalid rolled values rejected
+- **WHEN** an instance with `rolled_values: { sub_0: "3" }` or `rolled_values: { "bad key!": 3 }` is written
+- **THEN** the write is rejected
 
 #### Scenario: Invalid concentration_for rejected
 - **WHEN** an instance with `concentration_for: { source: "srd" }` or `concentration_for: { source: "srd", source_key: "bless", extra: 1 }` is written

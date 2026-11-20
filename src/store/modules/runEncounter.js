@@ -23,6 +23,8 @@ import {
 	effectiveEntity,
 	alsoHealAmount,
 	formulaVars,
+	rollEffectValues,
+	rolledValueNotices,
 	rollModifiers,
 	attackModifiers,
 	damageBonuses,
@@ -2449,6 +2451,19 @@ const run_encounter_actions = {
 		}
 
 		const effectKey = generateEffectKey(Object.keys(state.entities[key].effects));
+
+		// Values rolled when applied (Strength Drain −1d4): rolled once per instance and stored
+		await dispatch("resolve_effect_definitions", [instance]).catch((error) => console.error(error));
+		const { rolled_values, rolls } = rollEffectValues({
+			definition: getters.effect_definition(instance),
+			instance,
+			vars: {
+				self: formulaVars(state.entities[key]),
+				caster: formulaVars(state.entities[instance.caster_key]),
+			},
+		});
+		if (rolls.length) instance = { ...instance, rolled_values };
+
 		try {
 			if (!state.demo && !state.test) {
 				await dispatch("persist_effect", { key, effectKey, value: instance });
@@ -2461,6 +2476,24 @@ const run_encounter_actions = {
 		await dispatch("resolve_effect_definitions", [instance]).catch((error) =>
 			console.error(error)
 		);
+
+		// The rolls, as a notice
+		if (rolls.length) {
+			const effectName = (getters.effect_definition(instance)?.name || instance.name || "").capitalize();
+			commit("ADD_EFFECT_PROMPTS", [
+				{
+					kind: "notice",
+					id: `rolled:${key}:${effectKey}:${Date.now()}`,
+					holderKey: key,
+					effectKey,
+					holderName: state.entities[key]?.name,
+					effectName,
+					source: instance.source,
+					source_key: instance.source_key,
+					text: rolledValueNotices(rolls, effectName, instance).join("; "),
+				},
+			]);
+		}
 
 		// Maximum hit points: Aid-style also_heal, then keep current HP within the maximum
 		const resolved = getters.effect_definition(instance);

@@ -112,8 +112,13 @@ function linkProblems(link, { where, edition, trait }) {
 	}
 	if (!definition.editions.includes(edition)) problems.push(`${where}: "${key}" doesn't exist in ${edition}`);
 	if (link.effect.name !== definition.name) problems.push(`${where}: name should be "${definition.name}"`);
-	for (const kind of Object.keys(link.choices || {})) {
+	for (const [kind, choice] of Object.entries(link.choices || {})) {
 		if (!definition.choices.includes(kind)) problems.push(`${where}: "${key}" has no ${kind} choice`);
+		if (kind === "roll" && !validRollChoice(choice)) {
+			problems.push(`${where}: the roll choice must be { dice_count, dice_type, fixed_val } with dice, a fixed value, or both`);
+		} else if (kind !== "roll" && typeof choice !== "string") {
+			problems.push(`${where}: the ${kind} choice must be a string`);
+		}
 	}
 	if (link.level !== undefined && !definition.leveled) problems.push(`${where}: "${key}" has no levels`);
 	if (trait) {
@@ -185,12 +190,39 @@ function normalizeDuration(duration) {
 	return d;
 }
 
+/**
+ * A choice to compare: a roll as its numbers ({ dice_count, dice_type, fixed_val }, no fixed
+ * value of 0 next to dice), every other choice as a string
+ */
+function normalizeChoice(kind, value) {
+	if (kind !== "roll" || !value || typeof value !== "object") return String(value);
+	const roll = {};
+	for (const field of ["dice_count", "dice_type", "fixed_val"]) {
+		if (value[field] !== undefined && value[field] !== null && value[field] !== "") roll[field] = Number(value[field]);
+	}
+	if (roll.dice_count && roll.fixed_val === 0) delete roll.fixed_val;
+	return roll;
+}
+
+/**
+ * Whether a roll choice is dice (count and die together), a whole fixed value, or both
+ */
+function validRollChoice(value) {
+	if (!value || typeof value !== "object") return false;
+	const keys = Object.keys(value);
+	if (keys.some((key) => !["dice_count", "dice_type", "fixed_val"].includes(key))) return false;
+	if (keys.some((key) => !Number.isInteger(value[key]))) return false;
+	const dice = value.dice_count !== undefined || value.dice_type !== undefined;
+	if (dice) return value.dice_count >= 1 && value.dice_count <= 99 && value.dice_type >= 2 && value.dice_type <= 100;
+	return value.fixed_val !== undefined;
+}
+
 function normalizeLink(link) {
 	if (!link || typeof link !== "object") return link;
 	const l = { ...link };
 	if (l.effect) l.effect = { ...l.effect, name: String(l.effect.name || "").toLowerCase() };
 	if (l.magical === false) delete l.magical;
-	if (l.choices) l.choices = Object.fromEntries(Object.entries(l.choices).map(([k, v]) => [k, String(v)]));
+	if (l.choices) l.choices = Object.fromEntries(Object.entries(l.choices).map(([k, v]) => [k, normalizeChoice(k, v)]));
 	l.duration = normalizeDuration(l.duration);
 	return l;
 }

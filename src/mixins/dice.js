@@ -526,13 +526,20 @@ export const dice = {
 				}
 
 				// Damage bonuses of a hit (Divine Favor, Magic Weapon, manual): their own damage rolls,
-				// of their damage type or the attack's first, none of it on a miss, crit like the rest
+				// of their damage type or the attack's first, none of it on a miss, crit like the rest.
+				// Penalty dice (sign −1) are subtracted; applyDamageModifiers keeps the type at 0 or more.
 				const firstType = returnRoll.actions[i].rolls[0]?.damage_type;
+				const attackTypes = returnRoll.actions[i].rolls.map((rolled) => rolled.damage_type);
 				for (const bonus of damageBonuses) {
 					const damage_type = bonus.damage_type || firstType;
 					if (!damage_type) continue;
+					// A penalty only lowers damage the hit has: none of its type, no roll for it
+					const penalty = bonus.dice_count ? bonus.sign < 0 : bonus.value < 0;
+					if (penalty && !attackTypes.includes(damage_type)) continue;
 					let rollResult;
 					if (bonus.dice_count && bonus.dice_type) {
+						const sign = bonus.sign < 0 ? -1 : 1;
+						const minus = sign < 0 ? "−" : "";
 						rollResult = this.rollD(
 							e.e,
 							bonus.dice_type,
@@ -540,15 +547,21 @@ export const dice = {
 							bonus.value || 0,
 							bonus.name
 						);
-						if (crit && this.critSettings === "double") {
-							rollResult.total += rollResult.throwsTotal;
+						if (sign < 0) {
 							const { n, d, m, s } = rollResult;
-							rollResult.roll = m !== 0 ? `2x(${n}d${d})${s}${m}` : `2x(${n}d${d})`;
+							rollResult.total = parseInt(m) - rollResult.throwsTotal;
+							rollResult.roll = m !== 0 ? `−${n}d${d}${s}${m}` : `−${n}d${d}`;
+						}
+						if (crit && this.critSettings === "double") {
+							rollResult.total += sign * rollResult.throwsTotal;
+							const { n, d, m, s } = rollResult;
+							rollResult.roll = m !== 0 ? `${minus}2x(${n}d${d})${s}${m}` : `${minus}2x(${n}d${d})`;
 						}
 						if (crit && this.critSettings === "max") {
 							const { n, d, m, s } = rollResult;
-							rollResult.total += n * d;
-							rollResult.roll = m !== 0 ? `(${n}d${d}+${n * d})${s}${m}` : `(${n}d${d}+${n * d}) `;
+							rollResult.total += sign * n * d;
+							rollResult.roll =
+								m !== 0 ? `${minus}(${n}d${d}+${n * d})${s}${m}` : `${minus}(${n}d${d}+${n * d}) `;
 						}
 					} else {
 						rollResult = {

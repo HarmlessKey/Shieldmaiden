@@ -45,18 +45,13 @@
 											}}
 										</template>
 									</span>
-									<!-- Bonus dice of effects (Bless +1d4, Bane −1d4); the name is cut off when short of space -->
-									<span
-										v-for="(bonus, b) in action.toHit.bonus_rolls || []"
-										:key="`bonus-${b}`"
-										class="bonus-roll"
-									>
-										<span class="bonus-roll__value">{{ bonusRollText(bonus) }}</span>
-										<span class="bonus-roll__name neutral-2"
-											>(<span class="truncate">{{ bonus.name }}</span>)</span
-										>
+									<!-- Bonus dice of effects (Bless +1d4, Bane −1d4): one value, each effect's dice in the tooltip -->
+									<span v-if="action.toHit.bonus_rolls?.length" class="bonus-roll effect-value">
+										{{ bonusRollText({ total: bonusRollsTotal(action.toHit.bonus_rolls) }) }}
 										<q-tooltip anchor="top middle" self="bottom middle">
-											{{ bonusRollDetail(bonus) }}
+											<div v-for="(bonus, b) in groupedBonusRolls(action.toHit.bonus_rolls)" :key="`bonus-${b}`">
+												{{ bonusRollDetail(bonus) }}
+											</div>
 										</q-tooltip>
 									</span>
 								</div>
@@ -221,8 +216,10 @@
 
 					<!-- DAMAGE / HEALING ROLLS -->
 					<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
+						<!-- A damage penalty has no line of its own: it's shown on the damage it lowers -->
+						<template v-for="(rolled, rolled_index) in action.rolls">
 						<q-expansion-item
-							v-for="(rolled, rolled_index) in action.rolls"
+							v-if="!penaltyPart(action_index, rolled_index)"
 							:key="`rolled-${rolled_index}`"
 							:dark="$store.getters.theme === 'dark'"
 							switch-toggle-side
@@ -378,7 +375,23 @@
 								<hr />
 								<div>
 									<b>Final result</b><br />
-									(<hk-animated-integer :value="rolled.rollResult.total" />)
+									(<hk-animated-integer :value="rolled.rollResult.total" /><template
+										v-if="damagePart(action_index, rolled_index)?.penalties?.length"
+										><!-- Effects' penalties: one value, each effect's dice in the tooltip -->
+										<span class="effect-value"
+											>− {{ penaltiesTotal(damagePart(action_index, rolled_index).penalties) }}
+											<q-tooltip anchor="top middle" self="bottom middle">
+												<div
+													v-for="(penalty, penalty_index) in groupedPenalties(
+														damagePart(action_index, rolled_index).penalties
+													)"
+													:key="`penalty-${penalty_index}`"
+												>
+													{{ penaltyDetail(penalty) }}
+												</div>
+											</q-tooltip></span
+										></template
+									>)
 									<span v-if="goesToDuplicate(action_index)"> {{ duplicateOutcomeText(action_index) }}</span>
 									<span
 										v-else-if="
@@ -436,6 +449,7 @@
 								</div>
 							</div>
 						</q-expansion-item>
+						</template>
 					</q-list>
 
 					<!-- EFFECTS LINKED TO THE ACTION: whether they apply with the chosen result, and
@@ -471,8 +485,16 @@
 								class="linked-effects__fields"
 							>
 								<template v-for="choice in openChoices(linked)">
+									<ChosenRollInput
+										v-if="choice.kind === 'roll'"
+										:key="`${linked.key}-${choice.kind}`"
+										:value="linkAnswer(linked, choice)"
+										required
+										class="mb-1"
+										@input="setLinkChoice(linked.key, choice.kind, $event === undefined ? null : $event)"
+									/>
 									<hk-select
-										v-if="choiceField(choice).options"
+										v-else-if="choiceField(choice).options"
 										:key="`${linked.key}-${choice.kind}`"
 										:value="linkForm(linked.key).choices[choice.kind]"
 										:options="choiceField(choice).options"
@@ -485,7 +507,7 @@
 									<hk-input
 										v-else
 										:key="`${linked.key}-${choice.kind}`"
-										:value="linkForm(linked.key).choices[choice.kind]"
+										:value="linkAnswer(linked, choice)"
 										:label="`${choiceField(choice).label} *`"
 										:type="choice.kind === 'value' ? 'number' : 'text'"
 										class="mb-1"
@@ -692,6 +714,7 @@ import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import ApplicationDuration from "src/components/hk-components/hk-effects-form/ApplicationDuration.vue";
+import ChosenRollInput from "src/components/hk-components/hk-effects-form/ChosenRollInput.vue";
 import { choiceField } from "src/components/hk-components/hk-effects-form/fieldControls";
 import { calc_mod } from "src/utils/generalFunctions";
 import { displayStats } from "src/utils/entityFunctions";
@@ -703,6 +726,9 @@ import {
 	linkApplication,
 	findSrdDefinition,
 	getRequiredChoices,
+	choiceFixed,
+	storedChoice,
+	validChoice,
 	getSrdDefinitions,
 	targetDuplicates,
 	duplicateCheck,
@@ -718,6 +744,7 @@ export default {
 		TutorialPopover,
 		BasicEntity,
 		ApplicationDuration,
+		ChosenRollInput,
 	},
 	props: {
 		value: {
@@ -895,9 +922,9 @@ export default {
 						const definition = this.linkDefinition(linked.link);
 						const item = linkApplication(linked.link, { cast: this.roll.cast, definition });
 						const choices = { ...item.application.choices };
-						for (const kind of item.openChoices) {
-							const answer = form.choices[kind];
-							if (answer !== undefined && answer !== null && answer !== "") choices[kind] = String(answer);
+						for (const choice of this.openChoices(linked)) {
+							const answer = this.linkAnswer(linked, choice);
+							if (validChoice(choice.kind, answer)) choices[choice.kind] = storedChoice(choice.kind, answer);
 						}
 						const application = { ...item.application, choices };
 						if (!linked.link.duration) application.duration = form.duration || { type: "cancelled" };
@@ -1114,6 +1141,14 @@ export default {
 		setLinkForm(key, field, value) {
 			this.$set(this.linkForms, key, { ...this.linkForm(key), [field]: value });
 		},
+		/**
+		 * The card's answer to a linked effect's open choice; a roll choice starts at the
+		 * defined dice until it's changed (null: cleared)
+		 */
+		linkAnswer(linked, choice) {
+			const answer = this.linkForm(linked.key).choices[choice.kind];
+			return answer === undefined ? choice.default : answer || undefined;
+		},
 		setLinkChoice(key, kind, value) {
 			const form = this.linkForm(key);
 			this.$set(this.linkForms, key, { ...form, choices: { ...form.choices, [kind]: value } });
@@ -1166,17 +1201,17 @@ export default {
 			const definition = this.linkDefinition(linked.link);
 			if (!definition) return [];
 			const fixed = linked.link.choices || {};
-			return getRequiredChoices(definition).filter(({ kind }) => fixed[kind] === undefined);
+			return getRequiredChoices(definition).filter(({ kind }) => !choiceFixed(kind, fixed));
 		},
 		/**
 		 * What a checked linked effect still needs before the roll can be applied, in words
 		 */
 		linkMissing(linked) {
 			const form = this.linkForm(linked.key);
-			const missing = this.openChoices(linked).find(({ kind }) => {
-				const answer = form.choices[kind];
-				return answer === undefined || answer === null || answer === "";
-			});
+			const missing = this.openChoices(linked).find(
+				(choice) => !validChoice(choice.kind, this.linkAnswer(linked, choice))
+			);
+			if (missing?.kind === "roll") return `Enter a roll for ${linked.name}: dice with a die, a fixed value, or both`;
 			if (missing) return `Choose a ${this.choiceField(missing).label.toLowerCase()} for ${linked.name}`;
 			if (!linked.link.duration && form.durationValid === false) return `Complete the duration of ${linked.name}`;
 			return undefined;
@@ -1229,6 +1264,39 @@ export default {
 		 */
 		bonusRollDetail({ name, dice: bonusDice, sign, throws = [] }) {
 			return `${name} ${sign < 0 ? "−" : "+"}${bonusDice}: ${throws.join(", ")}`;
+		},
+		/**
+		 * All effects' bonus dice of a roll added up
+		 */
+		bonusRollsTotal(bonusRolls = []) {
+			return bonusRolls.reduce((total, bonus) => total + (bonus.total || 0), 0);
+		},
+		/**
+		 * Bonus dice of the same effect and sign taken together (two stacked copies), so the line
+		 * shows one "− 5 (Shaky Aim)" with "Shaky Aim −2d4: 3, 2" in its tooltip
+		 */
+		groupedBonusRolls(bonusRolls = []) {
+			const groups = [];
+			for (const bonus of bonusRolls) {
+				const group = groups.find((entry) => entry.name === bonus.name && entry.sign === bonus.sign);
+				if (!group) {
+					groups.push({ ...bonus, throws: [...(bonus.throws || [])], all: [bonus] });
+					continue;
+				}
+				group.all.push(bonus);
+				group.total += bonus.total;
+				group.throws.push(...(bonus.throws || []));
+			}
+			return groups.map(({ all, ...group }) => {
+				if (all.length === 1) return group;
+				const sizes = new Set(all.map(({ dice }) => /^\d+d(\d+)$/.exec(dice || "")?.[1]));
+				const [size] = sizes;
+				const dice =
+					sizes.size === 1 && size
+						? `${all.reduce((count, { dice }) => count + parseInt(dice), 0)}d${size}`
+						: all.map(({ dice }) => dice).join(" + ");
+				return { ...group, dice };
+			});
 		},
 		/**
 		 * The notes of an attack's to-hit: why it's critical and the roll modifiers' notes
@@ -1536,6 +1604,13 @@ export default {
 				action.rolls.forEach((rolled, rolled_index) => {
 					parts.push({
 						key: `${action_index}:${rolled_index}`,
+						group: action_index,
+						name: rolled.name,
+						dice: rolled.rollResult.throws?.length
+							? String(rolled.rollResult.roll).replace(/^[−-]\s*/, "").trim()
+							: undefined,
+						// Each die, for a penalty's note ("2d4: 1 + 3")
+						throws: rolled.rollResult.throws?.length ? [...rolled.rollResult.throws] : undefined,
 						damageType: rolled.damage_type,
 						magical: rolled.magical,
 						amount: parseInt(rolled.rollResult.total) || 0,
@@ -1585,6 +1660,68 @@ export default {
 		damagePart(action_index, rolled_index) {
 			if (this.roll.actions[action_index]?.type === "healing") return undefined;
 			return this.damageResult().parts.find(({ key }) => key === `${action_index}:${rolled_index}`);
+		},
+		/**
+		 * The damage part of a penalty roll (subtracted from the damage of its type), if it is one
+		 */
+		penaltyPart(action_index, rolled_index) {
+			const part = this.damagePart(action_index, rolled_index);
+			return part?.subtracted !== undefined ? part : undefined;
+		},
+		/**
+		 * What a penalty on a damage line rolled: its dice and total, and whether it was limited
+		 * to the damage of its type, e.g. "1d4: 4, limited"
+		 */
+		penaltyNote({ dice, rolled, limited }) {
+			const roll = dice ? `${dice}: ${rolled}` : limited ? `${rolled}` : "";
+			return [roll, limited ? "limited" : ""].filter(Boolean).join(", ");
+		},
+		/**
+		 * All penalties on a damage line added up
+		 */
+		penaltiesTotal(penalties = []) {
+			return penalties.reduce((total, penalty) => total + (penalty.amount || 0), 0);
+		},
+		/**
+		 * A penalty in the tooltip: "Weak Grip −5 (2d4: 2 + 3)"
+		 */
+		penaltyDetail(penalty) {
+			const note = this.penaltyNote(penalty);
+			return `${penalty.name || "Penalty"} −${penalty.amount}${note ? ` (${note})` : ""}`;
+		},
+		/**
+		 * Penalties from the same effect taken together (two stacked copies): their amounts
+		 * added up, dice of one size counted together and the rolls listed, e.g.
+		 * "− 5 Weak Grip (2d4: 3 + 2)"
+		 */
+		groupedPenalties(penalties = []) {
+			const groups = [];
+			for (const penalty of penalties) {
+				const group = groups.find((entry) => entry.name === penalty.name);
+				if (!group) {
+					groups.push({ ...penalty, all: [penalty] });
+					continue;
+				}
+				group.all.push(penalty);
+				group.amount += penalty.amount;
+				group.limited = group.limited || penalty.limited;
+			}
+			return groups.map(({ all, ...group }) => {
+				if (all.length === 1) return group;
+				const sizes = new Set(all.map(({ dice }) => /^\d+d(\d+)$/.exec(dice || "")?.[1]));
+				const [size] = sizes;
+				const dice =
+					sizes.size === 1 && size
+						? `${all.reduce((count, { dice }) => count + parseInt(dice), 0)}d${size}`
+						: all.every(({ dice }) => dice)
+						? all.map(({ dice }) => dice).join(" + ")
+						: undefined;
+				// Each die when every copy has them, so "2d4: 1 + 3" never shows a total above a die
+				const rolled = all.every(({ throws }) => throws?.length)
+					? all.flatMap(({ throws }) => throws).join(" + ")
+					: all.map(({ rolled }) => rolled).join(" + ");
+				return { ...group, dice, rolled };
+			});
 		},
 		totalRollValue(action, action_index, roll) {
 			// Damage: after the target's damage modifiers and defenses
@@ -1706,9 +1843,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// Effects' values added up; hover for each effect's part
+.effect-value {
+	text-decoration: underline dotted;
+	text-underline-offset: 3px;
+	cursor: help;
+}
 .single-roll {
 	outline: none;
-	// Never wider than the rolls column (300px): long lines shrink (bonus names are cut off)
+	// Never wider than the rolls column (300px): long lines shrink
 	// instead of stretching the card
 	width: 100%;
 	max-width: 300px;
@@ -1785,26 +1928,7 @@ export default {
 				flex-shrink: 0;
 			}
 			.bonus-roll {
-				display: flex;
-				align-items: baseline;
-				gap: 4px;
-				min-width: 0;
-
-				&__value {
-					flex-shrink: 0;
-				}
-				&__name {
-					display: flex;
-					min-width: 0;
-					font-size: 13px;
-
-					.truncate {
-						min-width: 0;
-						overflow: hidden;
-						text-overflow: ellipsis;
-						white-space: nowrap;
-					}
-				}
+				flex-shrink: 0;
 			}
 
 			.total {

@@ -99,12 +99,12 @@ import EffectDetails from "src/components/drawers/encounter/effects/EffectDetail
 import ApplyEffect from "src/components/drawers/encounter/effects/ApplyEffect.vue";
 import EffectList from "src/components/drawers/encounter/effects/EffectList.vue";
 import {
+	customEffectsEnabled,
 	getSrdDefinitions,
 	isSrdCondition,
 	matchesName,
 	withCustomComingSoon,
 } from "src/utils/effectFunctions.js";
-import { custom_effects_released } from "src/utils/generalConstants";
 import { applyEffectMixin } from "src/mixins/applyEffect.js";
 
 export default {
@@ -184,7 +184,9 @@ export default {
 				.map((group) => ({ ...group, entries: group.entries.filter(({ name }) => matchesName(name, this.search)) }))
 				.filter((group) => group.entries.length);
 			// Signed-in users see that custom effects are coming soon, not in conditions mode
-			return this.mode !== "conditions" && this.user ? withCustomComingSoon(groups) : groups;
+			return this.mode !== "conditions" && this.user
+				? withCustomComingSoon(groups, customEffectsEnabled(this.$store.getters.userInfo))
+				: groups;
 		},
 		groups() {
 			const srdEntry = (definition) => ({
@@ -231,7 +233,7 @@ export default {
 	async mounted() {
 		if (this.single) {
 			await this.loadDefinition(this.single);
-		} else if (this.mode !== "conditions" && this.user && custom_effects_released) {
+		} else if (this.mode !== "conditions" && this.user && customEffectsEnabled(this.$store.getters.userInfo)) {
 			this.customEffects = (await this.get_effects()) ? this.$store.getters["effects/effects"] : [];
 		}
 		this.setEffectSize();

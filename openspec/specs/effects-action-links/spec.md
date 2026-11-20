@@ -17,8 +17,9 @@ The effects schema SHALL define an effect link with these fields, and no others:
 - `duration`: a duration as applied in the tracker (type, value and unit, anchor and edge,
   repeat save, escape, cancel triggers, ends when, effects when it ends)
 - `choices`: fixed choices by kind (`ability`, `damage_type`, `skill`, `condition`,
-  `creature_type`, `option`, `value`), each a string; a value choice is a number written as a
-  string
+  `creature_type`, `option`, `value`, `roll`); a value choice is a number written as a string,
+  a roll choice `{ dice_count, dice_type, fixed_val }` like a reminder's damage, every other
+  choice a string
 - `level`: the levels it applies, an integer of at least 1, for an effect with a level track
 - `magical`: a boolean
 - `scaling`: tiers that change the value choice and level with the slot or caster level, for
@@ -32,6 +33,10 @@ SHALL NOT carry `scaling` or `duration_scaling`.
 #### Scenario: A grapple link
 - **WHEN** a link is `{ effect: { source: "srd", source_key: "grappled", name: "Grappled" }, duration: { type: "cancelled", escape: { dc: 14 } } }`
 - **THEN** it validates against the effect link schema
+
+#### Scenario: A link with a fixed roll
+- **WHEN** a young gold dragon's Weakening Breath links Weakening Breath with `choices: { roll: { dice_count: 1, dice_type: 6 } }`
+- **THEN** it validates against the effect link schema, and the same link with `choices: { roll: "1d6" }` or `choices: { roll: { dice_count: 1 } }` does not
 
 #### Scenario: A link with a save is rejected
 - **WHEN** a link has `save: { ability: "constitution", dc: 13 }`
@@ -143,8 +148,9 @@ followed directly by its choices and level):
 - **Choices**: one field per choice the selected definition asks for (the choices the Effects
   drawer asks when applying it), without a subtitle. Each field is clearable and empty by
   default; an empty field shows "Chosen when applied" as its placeholder and leaves the choice
-  to be made when the effect is applied. A value choice SHALL be a number, a condition choice
-  one of the SRD conditions
+  to be made when the effect is applied. A value choice SHALL be a number, a roll choice
+  Dice, Die and Fixed value (dice need both a count and a die), a condition choice one of the
+  SRD conditions
 - **Level**: only when the selected definition has a level track; at least 1
 - **Duration**: the same duration fields as the Effects drawer's application form, and no
   others (see the next requirement); without a duration the effect's duration is asked when
@@ -157,6 +163,10 @@ is missing or a field is invalid.
 #### Scenario: Fixing a damage type
 - **WHEN** the user links the SRD Absorption effect to a clay golem trait and sets its damage type choice to acid
 - **THEN** the saved link has `choices: { damage_type: "acid" }`
+
+#### Scenario: Fixing a roll
+- **WHEN** the user links Weakening Breath to an adult gold dragon's breath and enters Dice 1 and Die d10 as its roll
+- **THEN** the saved link has `choices: { roll: { dice_count: 1, dice_type: 10 } }`, and applying it from the dragon's roll doesn't ask for the roll; with Dice set and no Die, Save stays disabled
 
 #### Scenario: Leaving a choice open
 - **WHEN** the user links Damage Resistance and leaves its damage type empty (it shows "Chosen when applied"), or clears it

@@ -1,10 +1,18 @@
 <template>
 	<div v-if="tier">
 		<hk-card>
-			<ContentHeader type="effects" :no-add="!released" />
+			<ContentHeader type="effects" :no-add="!released">
+				<!-- Admins test custom effects before the release: create them from JSON -->
+				<template v-if="adminOnly" #actions-after>
+					<button class="btn btn-sm bg-neutral-5" @click="paste_dialog = true">
+						<i aria-hidden="true" class="fas fa-paste green" />
+						<span class="d-none d-md-inline-block ml-1">Paste JSON</span>
+					</button>
+				</template>
+			</ContentHeader>
 
 			<!-- Not released yet: only the notice -->
-			<div v-if="!released" class="card-body">
+			<div v-if="!enabled" class="card-body">
 				<div class="coming-soon">
 					<div class="coming-soon__title">
 						<i aria-hidden="true" class="fas fa-sparkles blue mr-1" />
@@ -18,7 +26,13 @@
 				</div>
 			</div>
 			<div class="card-body" v-else-if="!loading_effects">
-				<p class="neutral-2">These are your custom effects.</p>
+				<p class="neutral-2">
+					These are your custom effects.
+					<template v-if="adminOnly">
+						Custom effects aren't released yet: as an admin you can create them from JSON and apply them
+						to test.
+					</template>
+				</p>
 				<template v-if="effects.length">
 					<q-input
 						:dark="$store.getters.theme !== 'light'"
@@ -56,7 +70,10 @@
 									:auto-width="col.name !== 'name'"
 								>
 									<template v-if="col.name !== 'actions'">
-										<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
+										<router-link
+											v-if="col.name === 'name' && released"
+											:to="`${$route.path}/${props.key}`"
+										>
 											{{ col.value }}
 										</router-link>
 										<template v-else>
@@ -65,7 +82,11 @@
 									</template>
 
 									<div v-else class="d-flex justify-content-end">
-										<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+										<router-link
+											v-if="released"
+											class="btn btn-sm bg-neutral-5"
+											:to="`${$route.path}/${props.key}`"
+										>
 											<i aria-hidden="true" class="fas fa-pencil" />
 											<q-tooltip anchor="top middle" self="center middle">Edit</q-tooltip>
 										</router-link>
@@ -87,8 +108,15 @@
 					</q-table>
 				</template>
 
+				<button
+					v-if="adminOnly && !effects.length"
+					class="btn btn-lg bg-neutral-5"
+					@click="paste_dialog = true"
+				>
+					<i aria-hidden="true" class="fas fa-paste green mr-1" /> Paste your first Effect
+				</button>
 				<router-link
-					v-if="!effects.length && !overencumbered"
+					v-else-if="!effects.length && !overencumbered"
 					class="btn btn-lg bg-neutral-5"
 					to="/content/effects/add-effect"
 				>
@@ -104,25 +132,32 @@
 			</div>
 			<hk-loader v-else name="effects" />
 		</hk-card>
+
+		<q-dialog v-if="adminOnly" v-model="paste_dialog">
+			<PasteEffect @created="paste_dialog = false" />
+		</q-dialog>
 	</div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
 import ContentHeader from "src/components/userContent/ContentHeader";
-import { matchesName } from "src/utils/effectFunctions";
+import PasteEffect from "src/views/UserContent/Effects/PasteEffect.vue";
+import { customEffectsEnabled, matchesName } from "src/utils/effectFunctions";
 import { custom_effects_released } from "src/utils/generalConstants";
 
 export default {
 	name: "Effects",
 	components: {
 		ContentHeader,
+		PasteEffect,
 	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,
 			released: custom_effects_released,
 			import_dialog: false,
+			paste_dialog: false,
 			loading_effects: true,
 			search: "",
 			columns: [
@@ -143,11 +178,19 @@ export default {
 		};
 	},
 	computed: {
-		...mapGetters(["tier", "overencumbered"]),
+		...mapGetters(["tier", "overencumbered", "userInfo"]),
 		...mapGetters("effects", ["effects"]),
+		// Custom effects are listed: released, or an admin testing them
+		enabled() {
+			return customEffectsEnabled(this.userInfo);
+		},
+		// An admin before the release: the list and Paste JSON, without the form
+		adminOnly() {
+			return this.enabled && !this.released;
+		},
 	},
 	async mounted() {
-		if (!this.released) return;
+		if (!this.enabled) return;
 		await this.get_effects();
 		this.loading_effects = false;
 	},

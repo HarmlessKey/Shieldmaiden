@@ -31,15 +31,23 @@
 
 		<!-- Choices -->
 		<template v-for="choice in askedChoices">
+			<!-- A roll: dice count, die and fixed value, starting at the defined dice -->
+			<ChosenRollInput
+				v-if="choice.kind === 'roll'"
+				:key="`choice-${choice.kind}`"
+				v-model="choices[choice.kind]"
+				required
+				class="mb-2"
+			/>
 			<q-input
-				v-if="!choiceOptions(choice)"
+				v-else-if="!choiceOptions(choice)"
 				:key="`choice-${choice.kind}`"
 				v-model="choices[choice.kind]"
 				:dark="$store.getters.theme === 'dark'"
 				:label="choiceLabel(choice.kind)"
 				:type="choice.kind === 'value' ? 'number' : 'text'"
 				:error="!choiceValid(choice.kind)"
-				:error-message="choice.kind === 'value' ? 'Enter a number' : 'Required'"
+				:error-message="choiceError(choice.kind)"
 				class="mb-2"
 				filled
 				square
@@ -122,13 +130,14 @@
 </template>
 
 <script>
-import { getRequiredChoices, concentrationPlan } from "src/utils/effectFunctions.js";
+import { getRequiredChoices, concentrationPlan, storedChoice, validChoice } from "src/utils/effectFunctions.js";
 import { choiceField } from "src/components/hk-components/hk-effects-form/fieldControls";
 import ApplicationDuration from "src/components/hk-components/hk-effects-form/ApplicationDuration.vue";
+import ChosenRollInput from "src/components/hk-components/hk-effects-form/ChosenRollInput.vue";
 
 export default {
 	name: "ApplyEffect",
-	components: { ApplicationDuration },
+	components: { ApplicationDuration, ChosenRollInput },
 	props: {
 		definition: {
 			type: Object,
@@ -174,7 +183,11 @@ export default {
 		return {
 			level: this.defaultLevel,
 			choices: Object.fromEntries(
-				getRequiredChoices(this.definition).map(({ kind }) => [kind, this.presetChoices[kind]])
+				// A roll choice starts at the defined dice ({ dice_count: 1, dice_type: 4 })
+				getRequiredChoices(this.definition).map(({ kind, default: preset }) => [
+					kind,
+					this.presetChoices[kind] ?? (preset ? { ...preset } : undefined),
+				])
 			),
 			// Built by ApplicationDuration
 			duration: { type: "cancelled" },
@@ -248,12 +261,14 @@ export default {
 			return choiceField({ kind }).label;
 		},
 		/**
-		 * Whether a choice is made; a value choice must be a number (it can be negative)
+		 * Whether a choice is made; a value choice must be a number (it can be negative), a roll
+		 * dice notation or a whole number
 		 */
 		choiceValid(kind) {
-			const choice = this.choices[kind];
-			if (kind === "value") return choice !== undefined && choice !== null && choice !== "" && Number.isFinite(Number(choice));
-			return !!choice;
+			return validChoice(kind, this.choices[kind]);
+		},
+		choiceError(kind) {
+			return kind === "value" ? "Enter a number" : "Required";
 		},
 		/**
 		 * Options for a choice, undefined for a free text choice
@@ -267,8 +282,8 @@ export default {
 			const application = { duration: { ...this.duration }, caster_key: this.casterKey || undefined };
 			const choices = {};
 			for (const { kind } of this.requiredChoices) {
-				// Choices are stored as strings (a value choice too: "2")
-				choices[kind] = kind === "value" ? String(Number(this.choices[kind])) : this.choices[kind];
+				// Choices are stored as strings (a value choice too: "2"), a roll as { dice_count, dice_type, fixed_val }
+				choices[kind] = storedChoice(kind, this.choices[kind]);
 			}
 			if (Object.keys(choices).length) application.choices = choices;
 			if (this.isExhaustion) application.level = this.level;

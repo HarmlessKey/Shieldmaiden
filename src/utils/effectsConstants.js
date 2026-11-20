@@ -140,13 +140,13 @@ export const effect_types = keyed({
 		label: "Minimum value",
 		description: "The value can't go below this (Barkskin: AC 16)",
 		sub_types: STAT_SUB_TYPES,
-		fields: ["value", "abilities"],
+		fields: ["value", "roll", "abilities"],
 	},
 	cap: {
 		label: "Maximum value",
 		description: "The value can't go above this",
 		sub_types: STAT_SUB_TYPES,
-		fields: ["value", "abilities"],
+		fields: ["value", "roll", "abilities"],
 	},
 	defense: {
 		label: "Defense",
@@ -841,6 +841,7 @@ export const choice_kinds = keyed({
 	creature_type: { label: "Creature type", field: "creature_types" },
 	option: { label: "Option" },
 	value: { label: "Value", field: "value" },
+	roll: { label: "Roll", field: "roll" },
 });
 
 /**

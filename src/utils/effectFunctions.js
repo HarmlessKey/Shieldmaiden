@@ -11,7 +11,7 @@ import {
 	skills,
 } from "src/utils/generalConstants.js";
 import { experience_table } from "src/utils/characterConstants.js";
-import { manualBonuses, skillBonusKey } from "src/utils/entityFunctions.js";
+import { BONUS_LABELS, manualBonuses, skillBonusKey } from "src/utils/entityFunctions.js";
 
 /**
  * The effect lists' groups (EffectList) with a Custom tab that says custom effects are coming
@@ -19,11 +19,23 @@ import { manualBonuses, skillBonusKey } from "src/utils/entityFunctions.js";
  * shows that nothing matches.
  *
  * @param {object[]} groups [{ name, entries }]
+ * @param {boolean} enabled Whether custom effects are available (customEffectsEnabled)
  * @returns {object[]}
  */
-export function withCustomComingSoon(groups) {
-	if (custom_effects_released || !groups.length) return groups;
+export function withCustomComingSoon(groups, enabled = custom_effects_released) {
+	if (enabled || !groups.length) return groups;
 	return [...groups, { name: "Custom", entries: [], notice: "Coming soon" }];
+}
+
+/**
+ * Whether custom effects are available to a user: once released, and before that for admins,
+ * so they can test them (their effects load in the lists and drawers, without the form)
+ *
+ * @param {object} userInfo The user's info (getters.userInfo)
+ * @returns {boolean}
+ */
+export function customEffectsEnabled(userInfo) {
+	return custom_effects_released || !!userInfo?.admin;
 }
 
 /**
@@ -271,7 +283,9 @@ export function traitEffectsLabel(ability) {
 		.filter((link) => link?.effect)
 		.map((link) => {
 			const name = link.effect.name || link.effect.source_key;
-			const choices = Object.values(link.choices || {}).join(", ");
+			const choices = Object.entries(link.choices || {})
+				.map(([kind, choice]) => (kind === "roll" ? chosenRollText(choice) : choice))
+				.join(", ");
 			return choices ? `${name} (${choices})` : name;
 		})
 		.join(", ");
@@ -416,6 +430,12 @@ export function cleanEffectLink(link = {}) {
 
 	const choices = {};
 	for (const [kind, value] of Object.entries(link.choices || {})) {
+		// A roll is { dice_count, dice_type, fixed_val }; every other choice a string
+		if (kind === "roll") {
+			const roll = chosenRoll(value);
+			if (roll) choices.roll = roll;
+			continue;
+		}
 		const text = value === undefined || value === null ? "" : String(value).trim();
 		if (text !== "") choices[kind] = text;
 	}
@@ -621,7 +641,7 @@ export function linkApplication(link = {}, { cast, definition } = {}) {
 	const openChoices = definition
 		? getRequiredChoices(definition)
 				.map(({ kind }) => kind)
-				.filter((kind) => choices[kind] === undefined)
+				.filter((kind) => !choiceFixed(kind, choices))
 		: [];
 
 	const application = { choices };
@@ -903,6 +923,7 @@ export async function resolveDefinition({ source, sourceKey, lookup }) {
 			description: definition.description,
 			ends_when: definition.ends_when,
 			condition: definition.condition,
+			stacking: definition.stacking,
 			sub_effects,
 		};
 	};
@@ -1200,16 +1221,31 @@ export function effectBadge(instance, definition) {
  * @param {string} holderName Its name as shown, if any
  * @param {function} casterOf instance => { name, label } of the caster as shown, or undefined:
  *   name for the duration text, label for the "from" line
- * @returns {object[]} { type, key, effectKey, entityKey, icon, initial, title, value, duration, duplicates, caster }
+ * @returns {object[]} { type, key, effectKey, entityKey, icon, initial, title, value, duration, duplicates, caster },
+ *   plus { count, effectKeys } for copies of one effect from one caster, which share a chip:
+ *   effectKey is the newest copy, effectKeys all copies newest first, value the lowest badge
  */
 export function effectChipItems(entries = [], { entityKey, holderName, casterOf = () => undefined } = {}) {
-	return entries.map(({ key, instance, definition }) => {
+	const groups = new Map();
+	for (const entry of entries) {
+		const id = copyKey(entry.instance);
+		if (!groups.has(id)) groups.set(id, []);
+		groups.get(id).push(entry);
+	}
+	return [...groups.values()].map((copies) => {
+		// Push keys sort by creation time: the newest copy is the highest key
+		const sorted = [...copies].sort((a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0));
+		const { key, instance, definition } = sorted[0];
 		const name = definition?.name || instance.name || "";
 		const title = name.charAt(0).toUpperCase() + name.slice(1);
 		const isCondition = isSrdCondition(instance.source, instance.source_key);
+		const badgeOf = (copy) => effectBadge(copy.instance, copy.definition);
+		const badges = sorted.map(badgeOf).filter((badge) => badge !== undefined);
+		// The copy that ends first gives the badge and the duration
+		const first = sorted.find((copy) => badgeOf(copy) === Math.min(...badges)) || sorted[0];
 		const caster = casterOf(instance);
-		const duplicates = duplicatesOf(instance, definition);
-		return {
+		const duplicates = duplicatesOf(first.instance, first.definition);
+		const item = {
 			type: "effect",
 			key: `effect:${key}`,
 			effectKey: key,
@@ -1217,12 +1253,28 @@ export function effectChipItems(entries = [], { entityKey, holderName, casterOf 
 			icon: isCondition ? instance.source_key : undefined,
 			initial: title.charAt(0),
 			title,
-			value: effectBadge(instance, definition),
-			duration: describeDuration(instance, { casterName: caster?.name, holderName }),
+			value: badges.length ? Math.min(...badges) : undefined,
+			duration: describeDuration(first.instance, { casterName: caster?.name, holderName }),
 			duplicates: duplicates ? `${plural(duplicates.left, "duplicate")} left` : undefined,
 			caster: caster?.label,
 		};
+		if (sorted.length > 1) {
+			item.count = sorted.length;
+			item.effectKeys = sorted.map((copy) => copy.key);
+		}
+		return item;
 	});
+}
+
+/**
+ * Key shared by copies of the same effect from the same caster on one entity, which share a
+ * chip and are listed together in the detail view
+ *
+ * @param {object} instance Active effect instance
+ * @returns {string}
+ */
+export function copyKey(instance = {}) {
+	return `${instance.source}:${instance.source_key}:${instance.caster_key || ""}`;
 }
 
 /**
@@ -1258,7 +1310,9 @@ export function choiceKinds(sub_effect) {
  * @returns {boolean}
  */
 export function missingChoice(sub_effect, instance) {
-	return choiceKinds(sub_effect).some((kind) => instance?.choices?.[kind] === undefined);
+	return choiceKinds(sub_effect).some((kind) =>
+		kind === "roll" ? !rollChoiceOf(instance?.choices) : instance?.choices?.[kind] === undefined
+	);
 }
 
 // The sub-effect field each choice kind fills (option fills none)
@@ -1283,6 +1337,8 @@ const CHOICE_FIELDS = {
  */
 export function fixChoices(definition, choices = {}) {
 	const fixed = Object.keys(choices).filter((kind) => choices[kind] !== undefined);
+	// A link made while the effect had a value choice fixes its roll with the value
+	if (!fixed.includes("roll") && rollChoiceOf(choices)) fixed.push("roll");
 	const fix = (value) => {
 		if (Array.isArray(value)) return value.map(fix);
 		if (!value || typeof value !== "object") return value;
@@ -1295,6 +1351,13 @@ export function fixChoices(definition, choices = {}) {
 			// (describeSubEffect) describes the fixed values instead
 			if (kinds.some((kind) => fixed.includes(kind))) delete copy.description;
 			for (const kind of kinds.filter((fixedKind) => fixed.includes(fixedKind))) {
+				// A fixed roll: its dice in the sub-effect's roll, which keeps its damage type
+				if (kind === "roll") {
+					const chosen = withChosenRoll({ ...copy, choice: "roll" }, { choices });
+					for (const key of Object.keys(copy)) if (!(key in chosen)) delete copy[key];
+					Object.assign(copy, chosen);
+					continue;
+				}
 				const field = CHOICE_FIELDS[kind];
 				if (field) copy[field] = field === "value" ? choices[kind] : [choices[kind]];
 			}
@@ -1318,7 +1381,8 @@ export function fixChoices(definition, choices = {}) {
  * Collected from `choice` on sub-effects and `damage_type_choice` on rolls.
  *
  * @param {object} definition Effect definition
- * @returns {{ kind: string, options?: string[] }[]} One entry per choice kind
+ * @returns {{ kind: string, options?: string[], default?: object }[]} One entry per choice kind;
+ *   a roll choice's default is the first defined dice ({ dice_count: 1, dice_type: 4 })
  */
 export function getRequiredChoices(definition) {
 	const choices = {};
@@ -1342,6 +1406,10 @@ export function getRequiredChoices(definition) {
 				if (kind === "damage_type" && sub_effect.damage_types?.length) {
 					addChoice(kind, sub_effect.damage_types);
 				} else addChoice(kind);
+				// A roll choice offers the defined dice
+				if (kind === "roll" && !choices.roll.default && defaultRoll(sub_effect)) {
+					choices.roll.default = defaultRoll(sub_effect);
+				}
 			}
 			if (Array.isArray(sub_effect.roll?.damage_type_choice)) {
 				addChoice("damage_type", sub_effect.roll.damage_type_choice);
@@ -2566,6 +2634,166 @@ export function withChosenValue(sub_effect, instance) {
 	return chosen === undefined || chosen === "" ? rest : { ...rest, value: chosen };
 }
 
+/**
+ * A chosen roll as stored: { dice_count, dice_type, fixed_val }, like a reminder's damage.
+ * Dice need a count of 1 to 99 and a die of 2 to 100, given together; the fixed value is a
+ * whole number and can be the whole roll ({ fixed_val: 5 }). Numeric strings are read as
+ * numbers.
+ *
+ * @param {object} choice The entered or stored roll
+ * @returns {{ dice_count?: number, dice_type?: number, fixed_val?: number }|undefined} The
+ *   cleaned roll (no fixed_val of 0 next to dice), undefined when it isn't a roll
+ */
+export function chosenRoll(choice) {
+	if (!choice || typeof choice !== "object") return undefined;
+	const number = (value) => (value === undefined || value === null || value === "" ? undefined : Number(value));
+	const dice_count = number(choice.dice_count);
+	const dice_type = number(choice.dice_type);
+	const fixed_val = number(choice.fixed_val);
+	if (fixed_val !== undefined && !Number.isInteger(fixed_val)) return undefined;
+	const hasDice = dice_count !== undefined || dice_type !== undefined;
+	if (hasDice) {
+		if (!Number.isInteger(dice_count) || dice_count < 1 || dice_count > 99) return undefined;
+		if (!Number.isInteger(dice_type) || dice_type < 2 || dice_type > 100) return undefined;
+		return fixed_val ? { dice_count, dice_type, fixed_val } : { dice_count, dice_type };
+	}
+	return fixed_val === undefined ? undefined : { fixed_val };
+}
+
+/**
+ * The roll of an instance's or link's choices: `roll`, or a numeric `value` as a fixed roll.
+ * The value is for effects that switched from a value choice to a roll choice (the generic
+ * Damage Over Time and Hit Point Maximum Reduction): instances and links made before still
+ * have `choices.value`.
+ *
+ * @param {object} choices
+ * @returns {object|undefined} chosenRoll
+ */
+export function rollChoiceOf(choices = {}) {
+	const roll = chosenRoll(choices?.roll);
+	if (roll) return roll;
+	const value = choices?.value;
+	if (value === undefined || value === null || value === "" || !Number.isFinite(Number(value))) return undefined;
+	return { fixed_val: Math.trunc(Number(value)) };
+}
+
+/**
+ * Whether choices (a link's, an instance's) settle a choice kind; a roll also by a value
+ * (rollChoiceOf)
+ *
+ * @param {string} kind
+ * @param {object} choices
+ * @returns {boolean}
+ */
+export function choiceFixed(kind, choices = {}) {
+	return kind === "roll" ? !!rollChoiceOf(choices) : choices?.[kind] !== undefined;
+}
+
+/**
+ * A chosen roll in words: "2d6+1", "1d4", "5"
+ *
+ * @param {object} choice
+ * @returns {string} Empty when it isn't a roll
+ */
+export function chosenRollText(choice) {
+	const roll = chosenRoll(choice);
+	if (!roll) return "";
+	if (!roll.dice_count) return String(roll.fixed_val);
+	return rollText({ dice_count: roll.dice_count, dice_type: roll.dice_type, fixed_val: roll.fixed_val || 0 });
+}
+
+/**
+ * A sub-effect's defined dice, the default of its roll choice: { dice_count, dice_type,
+ * fixed_val }; undefined without dice
+ *
+ * @param {object} sub_effect
+ * @returns {object|undefined}
+ */
+export function defaultRoll(sub_effect) {
+	const roll = sub_effect?.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : undefined;
+	const dice_count = parseInt(roll?.dice_count);
+	const dice_type = parseInt(roll?.dice_type);
+	if (!dice_count || !dice_type) return undefined;
+	return chosenRoll({ dice_count, dice_type, fixed_val: parseInt(roll.fixed_val) || undefined });
+}
+
+/**
+ * The dice of a sub-effect's defined roll in words, the default of a roll choice: "1d4",
+ * "2d6+1"; undefined without dice
+ *
+ * @param {object} sub_effect
+ * @returns {string|undefined}
+ */
+export function rollNotation(sub_effect) {
+	const roll = defaultRoll(sub_effect);
+	return roll ? chosenRollText(roll) : undefined;
+}
+
+/**
+ * A sub-effect with its chosen roll (choice "roll"): the chosen dice replace the roll's
+ * dice, fixed value and modifier, and keep its damage type and magical. A whole number becomes
+ * the value, without dice. Without a (valid) chosen roll it has no roll amount and no value,
+ * so it does nothing.
+ *
+ * @param {object} sub_effect
+ * @param {object} instance Active effect instance (choices.roll)
+ * @returns {object} New object when changed, the input otherwise
+ */
+export function withChosenRoll(sub_effect, instance) {
+	if (!choiceKinds(sub_effect).includes("roll")) return sub_effect;
+	const parsed = rollChoiceOf(instance?.choices);
+	const { value, roll, ...rest } = sub_effect; // eslint-disable-line no-unused-vars
+	// eslint-disable-next-line no-unused-vars
+	const { dice_count, dice_type, fixed_val, modifier, ...kept } = roll && typeof roll === "object" ? roll : {};
+	const keptRoll = Object.keys(kept).length ? { roll: kept } : {};
+	if (!parsed) return { ...rest, ...keptRoll };
+	if (parsed.dice_count === undefined) return { ...rest, ...keptRoll, value: parsed.fixed_val };
+	const chosen = { ...kept, dice_count: parsed.dice_count, dice_type: parsed.dice_type };
+	if (parsed.fixed_val) chosen.fixed_val = parsed.fixed_val;
+	return { ...rest, roll: chosen };
+}
+
+/**
+ * Whether a choice entered when applying or on a link is valid: a value is a number (it can
+ * be negative), a roll dice and/or a fixed value (chosenRoll), anything else not empty
+ *
+ * @param {string} kind Choice kind
+ * @param {*} choice The entered choice
+ * @returns {boolean}
+ */
+export function validChoice(kind, choice) {
+	if (kind === "roll") return !!chosenRoll(choice);
+	if (choice === undefined || choice === null || choice === "") return false;
+	if (kind === "value") return Number.isFinite(Number(choice));
+	return true;
+}
+
+/**
+ * A valid choice as stored in `choices`: strings, a value as a number ("2"), a roll as
+ * { dice_count, dice_type, fixed_val }
+ *
+ * @param {string} kind Choice kind
+ * @param {*} choice A valid choice
+ * @returns {string|object}
+ */
+export function storedChoice(kind, choice) {
+	if (kind === "value") return String(Number(choice));
+	if (kind === "roll") return chosenRoll(choice);
+	return choice;
+}
+
+/**
+ * A sub-effect with every choice of the instance that changes its amount: the chosen value
+ * and the chosen roll
+ *
+ * @param {object} sub_effect
+ * @param {object} instance Active effect instance
+ * @returns {object}
+ */
+export function withChoices(sub_effect, instance) {
+	return withChosenRoll(withChosenValue(sub_effect, instance), instance);
+}
+
 function flatFormulaVars({ vars = {}, instance = {}, event = {} }) {
 	const flat = Object.create(null);
 	for (const [name, value] of Object.entries(vars.self || {})) flat[name] = value;
@@ -2592,7 +2820,10 @@ function amountRoll(sub_effect, flat) {
 	let dice_count = 0;
 	let dice_type;
 	let fixed_val = 0;
-	if (roll) {
+	// A roll with only a damage type or magical (a chosen whole number) leaves the amount to the value
+	const rollAmount =
+		roll && (roll.dice_count !== undefined || roll.fixed_val !== undefined || roll.modifier !== undefined);
+	if (rollAmount || (roll && sub_effect.value === undefined)) {
 		dice_count = parseInt(roll.dice_count) || 0;
 		dice_type = parseInt(roll.dice_type) || undefined;
 		fixed_val = parseInt(roll.fixed_val) || 0;
@@ -2613,8 +2844,175 @@ function amountRoll(sub_effect, flat) {
 }
 
 /**
+ * A bonus sub-effect's dice and flat amount with their sign, the same for d20 roll bonuses and
+ * damage bonuses. With dice, a negative multiplier or a negative fixed value makes the dice a
+ * penalty (Bane −1d4), and only a positive fixed value is added. Without dice, the value and
+ * fixed value are added and multiplied by the multiplier.
+ *
+ * @param {object} sub_effect
+ * @param {number} value Its resolved value, 0 without one
+ * @returns {{ dice_count: number, dice_type: number, sign: number, flat: number }}
+ */
+export function signedRoll(sub_effect, value = 0) {
+	const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};
+	const dice_count = parseInt(rollSpec.dice_count) || 0;
+	const dice_type = parseInt(rollSpec.dice_type) || 0;
+	const fixed = parseInt(rollSpec.fixed_val) || 0;
+	const multiplier = typeof sub_effect.multiplier === "number" ? sub_effect.multiplier : undefined;
+	if (dice_count && dice_type) {
+		const sign = multiplier < 0 || fixed < 0 ? -1 : 1;
+		return { dice_count, dice_type, sign, flat: Math.floor(value + Math.max(0, fixed)) };
+	}
+	return { dice_count: 0, dice_type: 0, sign: 1, flat: Math.floor((value + fixed) * (multiplier ?? 1)) };
+}
+
+// Sub-types of a numeric sub-effect that change an effective value (see statFields)
+export const STAT_SUB_TYPES = Object.freeze([
+	"ac",
+	"speed",
+	"fly_speed",
+	"swim_speed",
+	"climb_speed",
+	"burrow_speed",
+	"max_hp",
+	"initiative",
+	"passive_perception",
+	"spell_save_dc",
+	"spell_attack",
+	"ability_score",
+]);
+
+/**
+ * Key of a sub-effect in an instance's rolled_values: its id, or sub_<index> in the
+ * definition's sub_effects (a prefix, so Firebase doesn't store the map as an array)
+ *
+ * @param {object} sub_effect
+ * @param {number} index Its index in definition.sub_effects
+ * @returns {string}
+ */
+export function subEffectKey(sub_effect, index) {
+	return sub_effect?.id || `sub_${index}`;
+}
+
+/**
+ * Whether a numeric sub-effect's value is rolled when its effect is applied: a value type on
+ * a value (not temporary hit points) with dice, and no chosen value
+ *
+ * @param {object} sub_effect
+ * @returns {boolean}
+ */
+export function isRolledValue(sub_effect) {
+	if (!NUMERIC_TYPES.includes(sub_effect?.type)) return false;
+	if (!(sub_effect.sub_types || []).some((sub_type) => STAT_SUB_TYPES.includes(sub_type))) return false;
+	if (choiceKinds(sub_effect).includes("value")) return false;
+	const roll = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : undefined;
+	return !!(parseInt(roll?.dice_count) && parseInt(roll?.dice_type));
+}
+
+/**
+ * The rolls of an instance being applied: each of its definition's own sub-effects whose
+ * value is rolled (isRolledValue) and that applies at the instance's level, rolled once.
+ * The total (dice, fixed value and modifier formula) is stored before the multiplier.
+ *
+ * @param {object} definition Resolved definition
+ * @param {object} instance The instance being applied (level, choices)
+ * @param {object} vars { self, caster }: formula variables of the holder and the caster
+ * @param {function} random Returns a number in [0, 1), Math.random by default
+ * @returns {{ rolled_values: object, rolls: object[] }} rolled_values by sub-effect key (empty
+ *   when nothing is rolled); rolls: [{ key, sub_effect, dice_count, dice_type, throws, total, notes }]
+ */
+export function rollEffectValues({ definition, instance = {}, vars = {}, random = Math.random } = {}) {
+	const rolled_values = {};
+	const rolls = [];
+	if (!definition || definition.unresolved) return { rolled_values, rolls };
+	const flat = flatFormulaVars({ vars, instance });
+	const level = parseInt(instance.level) || 1;
+	(definition.sub_effects || []).forEach((original, index) => {
+		// A chosen roll is rolled like a defined one
+		const sub_effect = withChoices(original, instance);
+		if (!isRolledValue(sub_effect)) return;
+		if (sub_effect.min_level !== undefined && level < sub_effect.min_level) return;
+		if (sub_effect.max_level !== undefined && level > sub_effect.max_level) return;
+		const { dice_count, dice_type, fixed_val, notes } = amountRoll(sub_effect, flat);
+		const throws = [];
+		for (let i = 0; i < dice_count; i++) throws.push(Math.floor(random() * dice_type) + 1);
+		const total = throws.reduce((sum, value) => sum + value, 0) + fixed_val;
+		const key = subEffectKey(sub_effect, index);
+		rolled_values[key] = total;
+		rolls.push({ key, sub_effect, dice_count, dice_type, fixed_val, throws, total, notes });
+	});
+	return { rolled_values, rolls };
+}
+
+/**
+ * Text of a rolled value's roll: "1d4", "2d6+3"
+ */
+function rollText({ dice_count, dice_type, fixed_val }) {
+	const fixed = fixed_val ? (fixed_val > 0 ? `+${fixed_val}` : `${fixed_val}`) : "";
+	return `${dice_count}d${dice_type}${fixed}`;
+}
+
+/**
+ * Notice texts of the values rolled when an instance was applied:
+ * "Strength Drain: 1d4 = 3, Strength −3"
+ *
+ * @param {object[]} rolls rollEffectValues().rolls
+ * @param {string} effectName
+ * @param {object} instance The applied instance, for a chosen ability
+ * @returns {string[]}
+ */
+export function rolledValueNotices(rolls = [], effectName = "", instance = {}) {
+	return rolls.map(
+		(roll) => `${effectName}: ${rollText(roll)} = ${roll.total}, ${rolledChangeText(roll.sub_effect, roll.total, instance)}`
+	);
+}
+
+/**
+ * What a rolled total does to its stats: "Strength −3", "Armor Class at least 12"
+ *
+ * @param {object} sub_effect The rolled sub-effect
+ * @param {number} total Its rolled total
+ * @param {object} instance The instance, for a chosen ability
+ * @returns {string}
+ */
+function rolledChangeText(sub_effect, total, instance = {}) {
+	const chosenAbility = instance.choices?.ability;
+	const multiplier = typeof sub_effect.multiplier === "number" ? sub_effect.multiplier : 1;
+	const amount = Math.floor(total * multiplier);
+	const targets = (sub_effect.sub_types || [])
+		.filter((sub_type) => STAT_SUB_TYPES.includes(sub_type))
+		.flatMap((sub_type) =>
+			sub_type === "ability_score"
+				? [...(sub_effect.abilities || []), ...(chosenAbility ? [chosenAbility] : [])].map(
+						(ability) => BONUS_LABELS[ability] || ability
+				  )
+				: [BONUS_LABELS[sub_type] || sub_type]
+		);
+	const change = sub_effect.type === "bonus" ? (amount < 0 ? `−${Math.abs(amount)}` : `+${amount}`) : `${amount}`;
+	const verb = { base: "base ", fixed: "set to ", floor: "at least ", cap: "at most " }[sub_effect.type] || "";
+	return targets.map((target) => `${target} ${verb}${change}`).join(", ");
+}
+
+/**
+ * The stored rolled values of an instance in words, one per rolled sub-effect: ["Strength −3"]
+ *
+ * @param {object} instance Active effect instance
+ * @param {object} definition Its resolved definition
+ * @returns {string[]}
+ */
+export function rolledValueTexts(instance = {}, definition) {
+	if (!instance.rolled_values || !definition?.sub_effects) return [];
+	return definition.sub_effects
+		.map((sub_effect, index) => {
+			const total = instance.rolled_values[subEffectKey(sub_effect, index)];
+			return total === undefined ? undefined : rolledChangeText(sub_effect, total, instance);
+		})
+		.filter(Boolean);
+}
+
+/**
  * Hit points an instance heals when applied: its `bonus` `max_hp` sub-effects with
- * `also_heal` (Aid) that apply at its level
+ * `also_heal` (Aid) that apply at its level, a rolled one by its stored total
  *
  * @param {object} instance Active effect instance
  * @param {object} definition Its resolved definition
@@ -2626,12 +3024,18 @@ export function alsoHealAmount({ instance = {}, definition, vars = {} }) {
 	const flat = flatFormulaVars({ vars, instance });
 	const level = parseInt(instance.level) || 1;
 	let amount = 0;
-	for (const original of definition.sub_effects || []) {
-		const sub_effect = withChosenValue(original, instance);
+	for (const [index, original] of (definition.sub_effects || []).entries()) {
+		const sub_effect = withChoices(original, instance);
 		if (sub_effect.type !== "bonus" || !sub_effect.also_heal) continue;
 		if (!sub_effect.sub_types?.includes("max_hp")) continue;
 		if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 		if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
+		// A rolled value heals by the total rolled when applied
+		if (isRolledValue(sub_effect)) {
+			const total = instance.rolled_values?.[subEffectKey(original, index)];
+			if (typeof total === "number") amount += total * (sub_effect.multiplier ?? 1);
+			continue;
+		}
 		const { fixed_val, dice_count } = amountRoll(sub_effect, flat);
 		if (!dice_count) amount += fixed_val * (sub_effect.multiplier ?? 1);
 	}
@@ -2769,7 +3173,7 @@ export function applyNotices({ instance = {}, definition, holderName } = {}) {
 		(sub_effect.max_level === undefined || level <= sub_effect.max_level);
 	const notices = [];
 	for (const original of definition.sub_effects || []) {
-		const sub_effect = withChosenValue(original, instance);
+		const sub_effect = withChoices(original, instance);
 		if (!atLevel(sub_effect)) continue;
 		const text = sub_effect.description || describeSubEffect(sub_effect);
 		if (sub_effect.type === "fixed" && sub_effect.sub_types?.includes("temp_hp") && !sub_effect.trigger) {
@@ -2820,7 +3224,7 @@ export function tempHpParts({ sub_effects = [], instance = {}, event = {}, vars 
 				(sub_effect.max_level === undefined || level <= sub_effect.max_level)
 		)
 		.map((sub_effect) => {
-			const { dice_count, dice_type, fixed_val, notes } = amountRoll(withChosenValue(sub_effect, instance), flat);
+			const { dice_count, dice_type, fixed_val, notes } = amountRoll(withChoices(sub_effect, instance), flat);
 			return {
 				dice_count,
 				dice_type,
@@ -2888,7 +3292,7 @@ export function effectRollParts({
 		const dealerKey = !otherParty && casterPresent ? instance.caster_key : holderKey;
 
 		const { dice_count, dice_type, fixed_val, magical, notes } = amountRoll(
-			withChosenValue(sub_effect, instance),
+			withChoices(sub_effect, instance),
 			flat
 		);
 		const addMissing = (missing) => {
@@ -3067,6 +3471,20 @@ function bucket(map, key, make = () => []) {
 }
 
 /**
+ * Key that groups the instances of one definition on an entity, so the same definition counts
+ * once. With stacking.mode "independent" (Strength Drain) every instance gets its own key and
+ * counts.
+ *
+ * @param {object} instance
+ * @param {object} definition Resolved definition of the instance
+ * @param {string} effectKey Key of the instance on the entity
+ */
+export function stackKey(instance, definition, effectKey) {
+	const key = `${instance.source}:${instance.source_key}`;
+	return definition?.stacking?.mode === "independent" ? `${key}#${effectKey}` : key;
+}
+
+/**
  * Effective values of an entity from the numeric sub-effects of its active effects.
  * Stored values aren't changed; only fields whose value differs are returned.
  *
@@ -3092,7 +3510,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 		if (!definition || definition.unresolved) continue;
 
 		const name = effectLabel(definition, instance);
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		const level = parseInt(instance.level) || 1;
 		const ctx = { holderKey, instance, entities, definitionOf };
 		const definitionActive = !definition.condition || evaluateConditionSet(definition.condition, ctx);
@@ -3102,8 +3520,8 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 		for (const [key, value] of Object.entries(casterVars || {})) flat[`caster.${key}`] = value;
 		flat.level = level;
 
-		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+		for (const [index, original] of (definition.sub_effects || []).entries()) {
+			const sub_effect = withChoices(original, instance);
 			if (!NUMERIC_TYPES.includes(sub_effect.type)) continue;
 			const fields = [
 				...new Set((sub_effect.sub_types || []).flatMap((sub_type) => statFields(sub_type, sub_effect, instance, entity))),
@@ -3120,10 +3538,25 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 				continue;
 			}
 
-			// The amount: value (number, or formula with the instance's level), times a multiplier
-			const hasValue = sub_effect.value !== undefined;
-			let amount = 0;
-			if (hasValue) {
+			// The amount: the total rolled when applied, or the value (number, or formula with the
+			// instance's level), times a multiplier
+			const rolled = isRolledValue(sub_effect);
+			const total = rolled ? instance.rolled_values?.[subEffectKey(original, index)] : undefined;
+			let rollNote = "";
+			if (rolled) {
+				if (typeof total !== "number") {
+					notApplied("not rolled");
+					continue;
+				}
+				rollNote = ` (${rollText({
+					dice_count: parseInt(sub_effect.roll.dice_count),
+					dice_type: parseInt(sub_effect.roll.dice_type),
+					fixed_val: parseInt(sub_effect.roll.fixed_val) || 0,
+				})})`;
+			}
+			const hasValue = rolled || sub_effect.value !== undefined;
+			let amount = rolled ? total : 0;
+			if (hasValue && !rolled) {
 				const resolved = resolveAmount(sub_effect.value, flat);
 				if (resolved.missing.length || resolved.value === undefined) {
 					notApplied(`${resolved.missing.join(", ") || "value"} not known`);
@@ -3154,6 +3587,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 				entry = { kind: sub_effect.type, amount, text };
 			}
 			if (!entry) continue;
+			entry.text += rollNote;
 
 			for (const field of fields) {
 				bucket(byField, field).push({ ...entry, groupKey, effectKey, name });
@@ -3304,10 +3738,10 @@ export function effectiveDefenses({ entity, holderKey, entities = {}, definition
 	};
 
 	const seen = new Set();
-	for (const [, instance] of effectEntries(entity, holderKey)) {
+	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 
@@ -3570,7 +4004,7 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 
 		const entries = [];
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			const type = sub_effect.type;
 			const sub_types = sub_effect.sub_types || [];
 			if (isAttack && type === "critical") {
@@ -3627,7 +4061,6 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 
 			const entry = { name, effectKey, sub_effect, type, attackTypesNote };
 			if (type === "bonus") {
-				const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : undefined;
 				let value = 0;
 				if (sub_effect.value !== undefined) {
 					const resolved = resolveAmount(sub_effect.value, flat);
@@ -3637,21 +4070,9 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 					}
 					value = resolved.value;
 				}
-				const dice_count = parseInt(rollSpec?.dice_count) || 0;
-				const dice_type = parseInt(rollSpec?.dice_type) || 0;
-				if (rollSpec && dice_count && dice_type) {
-					const fixed = parseInt(rollSpec.fixed_val) || 0;
-					const sign = sub_effect.multiplier < 0 || fixed < 0 ? -1 : 1;
-					entry.dice = { name, dice_count, dice_type, sign };
-					// A positive fixed value is added; a negative one only gives the dice their sign
-					if (fixed > 0) value += fixed;
-				} else if (rollSpec) {
-					// A roll without dice (only a fixed value, or only `magical` for damage)
-					value += parseInt(rollSpec.fixed_val) || 0;
-				} else if (typeof sub_effect.multiplier === "number") {
-					value *= sub_effect.multiplier;
-				}
-				entry.value = Math.floor(value);
+				const { dice_count, dice_type, sign, flat: amount } = signedRoll(sub_effect, value);
+				if (dice_count) entry.dice = { name, dice_count, dice_type, sign };
+				entry.value = amount;
 			} else if (type === "roll_floor") {
 				const resolved = resolveAmount(sub_effect.value, flat);
 				if (resolved.missing.length || resolved.value === undefined) {
@@ -3665,7 +4086,7 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 			}
 			entries.push(entry);
 		}
-		if (entries.length) contributions.push({ groupKey: `${instance.source}:${instance.source_key}`, effectKey, entries });
+		if (entries.length) contributions.push({ groupKey: stackKey(instance, definition, effectKey), effectKey, entries });
 	}
 
 	// The same definition more than once: only the instance with the most entries counts
@@ -3808,6 +4229,49 @@ export function concentrationSaveDc(sub_effect, damage) {
 const signedText = (value) => (value < 0 ? `−${Math.abs(value)}` : `+${value}`);
 
 /**
+ * Bonus texts added up for a short summary: dice of the same size and sign are counted
+ * together and flat values summed, per damage type. ["−1d4", "−1d4", "+2"] → ["−2d4 +2"],
+ * ["+1d6 necrotic", "+1d4", "+1d6 necrotic"] → ["+2d6 necrotic", "+1d4"]. A text that isn't
+ * only dice, numbers and a type ("+formula") is kept as it is, after the others.
+ *
+ * @param {string[]} texts
+ * @returns {string[]}
+ */
+export function combineBonusTexts(texts = []) {
+	const groups = new Map();
+	const rest = [];
+	for (const text of texts) {
+		const match = String(text).trim().match(/^((?:[+−-]\s*\d+(?:d\d+)?\s*)+)([a-z_ ]*)$/i);
+		if (!match) {
+			rest.push(text);
+			continue;
+		}
+		const type = match[2].trim();
+		if (!groups.has(type)) groups.set(type, { flat: 0, dice: new Map() });
+		const group = groups.get(type);
+		for (const [, sign, count, die] of match[1].matchAll(/([+−-])\s*(\d+)(?:d(\d+))?/g)) {
+			const factor = sign === "+" ? 1 : -1;
+			if (die) {
+				const key = `${factor}:${die}`;
+				group.dice.set(key, (group.dice.get(key) || 0) + Number(count));
+			} else {
+				group.flat += factor * Number(count);
+			}
+		}
+	}
+	const combined = [];
+	for (const [type, { flat, dice }] of groups) {
+		const parts = [...dice].map(([key, count]) => {
+			const [factor, die] = key.split(":");
+			return `${Number(factor) < 0 ? "−" : "+"}${count}d${die}`;
+		});
+		if (flat) parts.push(signedText(flat));
+		if (parts.length) combined.push(`${parts.join(" ")}${type ? ` ${type}` : ""}`);
+	}
+	return [...combined, ...rest];
+}
+
+/**
  * Turns roll modifiers into what a roll needs: the modifier with the flat bonuses, the
  * Advantage object (effects and the DM's choice; both cancel), bonus dice, an automatic
  * result, and note lines for the result and tooltips
@@ -3864,8 +4328,9 @@ export function attackModifiers({ attackerKey, targetKey, attackType, source, en
  * @param {object} instance For a chosen damage type
  * @param {string} name The effect's name
  * @param {object} vars Formula variables
- * @returns {object|null|undefined} { name, magical, damage_type, dice_count, dice_type, value };
- *   null when it adds nothing, undefined when its value can't be worked out
+ * @returns {object|null|undefined} { name, magical, damage_type, dice_count, dice_type, sign, value }:
+ *   sign −1 subtracts the dice; null when it adds nothing, undefined when its value can't be
+ *   worked out
  */
 function damageAmount(sub_effect, instance, name, vars) {
 	const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};
@@ -3875,20 +4340,22 @@ function damageAmount(sub_effect, instance, name, vars) {
 		if (resolved.missing.length || resolved.value === undefined) return undefined;
 		value = resolved.value;
 	}
-	value += parseInt(rollSpec.fixed_val) || 0;
 	const damage_type =
 		rollSpec.damage_type ||
 		(Array.isArray(rollSpec.damage_type_choice) ? instance.choices?.damage_type : undefined);
+	// The sign as for roll bonuses: negative dice are a penalty (signedRoll)
+	const { dice_count, dice_type, sign, flat } = signedRoll(sub_effect, value);
 	const bonus = {
 		name,
 		// Definitions are generic: the roll says whether its damage is magical
 		magical: !!rollSpec.magical,
 		damage_type,
-		dice_count: parseInt(rollSpec.dice_count) || 0,
-		dice_type: parseInt(rollSpec.dice_type) || 0,
-		value: Math.floor(value),
+		dice_count,
+		dice_type,
+		sign,
+		value: flat,
 	};
-	return bonus.value || (bonus.dice_count && bonus.dice_type) ? bonus : null;
+	return bonus.value || bonus.dice_count ? bonus : null;
 }
 
 /**
@@ -3913,10 +4380,10 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 
 	const selfVars = formulaVars(attacker);
 	const seen = new Set();
-	for (const [, instance] of effectEntries(attacker, attackerKey)) {
+	for (const [effectKey, instance] of effectEntries(attacker, attackerKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 
 		const name = effectLabel(definition, instance);
@@ -3940,7 +4407,7 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 
 		let found = false;
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect.type !== "bonus" || !(sub_effect.sub_types || []).includes("damage")) continue;
 			if (sub_effect.perspective === "against") continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
@@ -3976,10 +4443,10 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 	// The target's damage when this attacker hits it (Hex, Hunter's Mark), rolled with the attack
 	const target = entities[targetKey];
 	const seenOnTarget = new Set();
-	for (const [, instance] of target && targetKey !== attackerKey ? effectEntries(target, targetKey) : []) {
+	for (const [effectKey, instance] of target && targetKey !== attackerKey ? effectEntries(target, targetKey) : []) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seenOnTarget.has(groupKey)) continue;
 
 		const name = effectLabel(definition, instance);
@@ -4003,7 +4470,7 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 
 		let found = false;
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (!hitTakenDamage(sub_effect) || !hitTakenBy(sub_effect, instance, attackerKey)) continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
@@ -4059,10 +4526,10 @@ export function restrictions({ entity, holderKey, entities = {}, definitionOf = 
 	const result = [];
 	if (!entity) return result;
 	const seen = new Set();
-	for (const [, instance] of effectEntries(entity, holderKey)) {
+	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 
@@ -4165,7 +4632,7 @@ function activeDefinitions({ entity, holderKey, entities, definitionOf, counterp
 	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 		const ctx = { holderKey, instance, entities, definitionOf, counterpartKey };
@@ -4212,7 +4679,7 @@ export function damageModifiers({ entity, holderKey, entities = {}, definitionOf
 	for (const active of activeDefinitions({ entity, holderKey, entities, definitionOf, counterpartKey })) {
 		const { effectKey, instance, definition, ctx, name, definitionState } = active;
 		(definition.sub_effects || []).forEach((original, index) => {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect?.type !== "damage_modifier" || sub_effect.trigger) return;
 			if ((sub_effect.direction || "incoming") !== "incoming") return;
 			if (!subEffectInPlay(sub_effect, active)) return;
@@ -4299,12 +4766,16 @@ export function damageTypeMatches({ damageTypes, exceptTypes }, damageType) {
 }
 
 /**
- * The damage a creature takes after its damage modifiers, per damage part. In order: the
- * save/miss factor (Evasion changes it for Dexterity saves for half), reductions, halving,
- * negation, absorption, then defenses. Each part is rounded down.
+ * The damage a creature takes after its damage modifiers, per damage part. In order: damage
+ * penalties (negative parts, subtracted from the damage of their type in their group, never
+ * below 0), the save/miss factor (Evasion changes it for Dexterity saves for half),
+ * reductions, halving, negation, absorption, then defenses. A damage part lists the penalties
+ * subtracted from it in `penalties` ([{ name, amount }]); a penalty part ends at 0, with
+ * `subtracted` what it took off and `penalty` what it rolled when it was limited.
  *
- * @param {object[]} parts [{ damageType, amount, factor, saveHalf, save }]: the rolled amount,
- *   the save/miss factor (1, 0.5, 0), whether a successful save halves it, and its own save
+ * @param {object[]} parts [{ damageType, amount, factor, saveHalf, save, group }]: the rolled
+ *   amount, the save/miss factor (1, 0.5, 0), whether a successful save halves it, its own
+ *   save, and the hit it belongs to (a penalty only lowers parts of its own group)
  * @param {object} modifiers Result of damageModifiers
  * @param {object} active { [toggleId]: rolled amount (reduce) or true (halve/negate) }
  * @param {object} save { ability, result: "save" | "fail" } of the target, if it saved
@@ -4319,6 +4790,36 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 	};
 	const result = parts.map((part) => ({ ...part }));
 
+	// Damage penalties (negative parts) are subtracted from the damage of their type in their
+	// group first, so the later steps (resistance, halving) work on what's left, and no damage
+	// type goes below 0. The damage part lists them in `penalties`; the penalty part keeps 0, with
+	// what it took off in `subtracted`, and what it rolled in `penalty` when it was limited.
+	for (const part of result) {
+		const amount = parseInt(part.amount) || 0;
+		if (amount >= 0) continue;
+		let left = -amount;
+		const taken = [];
+		for (const target of result) {
+			if (!left) break;
+			if (target === part || target.group !== part.group || target.damageType !== part.damageType) continue;
+			const available = parseInt(target.amount) || 0;
+			if (available <= 0) continue;
+			const used = Math.min(left, available);
+			target.amount = available - used;
+			taken.push({ target, used });
+			left -= used;
+		}
+		for (const { target, used } of taken) {
+			const entry = { name: part.name, amount: used, rolled: -amount, limited: left > 0 };
+			if (part.dice) entry.dice = part.dice;
+			if (part.throws?.length) entry.throws = part.throws;
+			target.penalties = [...(target.penalties || []), entry];
+		}
+		part.subtracted = -amount - left;
+		if (left) part.penalty = amount;
+		part.amount = 0;
+	}
+
 	// Evasion: a Dexterity save for half takes nothing on a success and half on a failure.
 	// A part can have its own save (several actions in one roll).
 	for (const part of result) {
@@ -4330,7 +4831,7 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 			factor = partSave.result === "save" ? 0 : 0.5;
 			note(`${evasion.name}: ${partSave.result === "save" ? "no damage" : "half damage"}`);
 		}
-		part.amount = Math.floor((parseInt(part.amount) || 0) * factor);
+		part.amount = Math.trunc((parseInt(part.amount) || 0) * factor);
 	}
 
 	for (const toggle of modifiers.toggles || []) {
@@ -4343,6 +4844,7 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 			// Subtracted from the matching parts in order, not below 0
 			let left = Math.max(0, parseInt(value) || 0);
 			for (const part of matching) {
+				if (part.amount <= 0) continue;
 				const used = Math.min(left, part.amount);
 				part.amount -= used;
 				part.reduced = (part.reduced || 0) + used;
@@ -4351,7 +4853,7 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 			note(`${toggle.name}: −${Math.max(0, parseInt(value) || 0)}`);
 		} else if (toggle.kind === "halve") {
 			for (const part of matching) {
-				part.amount = Math.floor(part.amount / 2);
+				part.amount = Math.trunc(part.amount / 2);
 				part.halved = true;
 			}
 			note(`${toggle.name}: halved`);
@@ -4367,15 +4869,18 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 	let healing = 0;
 	for (const part of result) {
 		const absorb = (modifiers.absorb || []).find((entry) => damageTypeMatches(entry, part.damageType));
-		if (absorb && part.damageType && part.amount > 0) {
+		// Absorbed damage heals instead; a penalty on it lowers the healing
+		if (absorb && part.damageType && part.amount !== 0) {
 			healing += part.amount;
 			part.absorbed = true;
 			part.amount = 0;
-			note(`${absorb.name}: heals instead`);
+			if (healing > 0) note(`${absorb.name}: heals instead`);
 			continue;
 		}
-		part.amount = Math.floor(part.amount * defenseOf(part.damageType, part));
+		part.amount = Math.trunc(part.amount * defenseOf(part.damageType, part));
 	}
+	healing = Math.max(0, healing);
+
 	return {
 		parts: result,
 		damage: result.reduce((total, part) => total + part.amount, 0),
@@ -4501,7 +5006,7 @@ export function healingReceivedCap({ entity, holderKey, entities = {}, definitio
 	for (const active of activeDefinitions({ entity, holderKey, entities, definitionOf })) {
 		const { definition, instance, ctx, name, definitionState } = active;
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect?.type !== "cap" || sub_effect.trigger) continue;
 			if (!(sub_effect.sub_types || []).includes("healing_received")) continue;
 			if (!subEffectInPlay(sub_effect, active)) continue;
@@ -4532,18 +5037,22 @@ export function damageBonusLines({ entity, definitionOf = () => undefined } = {}
 	for (const [effectKey, instance] of effectEntries(entity)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		const name = effectLabel(definition, instance);
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect.type !== "bonus" || !(sub_effect.sub_types || []).includes("damage")) continue;
 			if (sub_effect.perspective === "against") continue;
 			const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};
 			const parts = [];
-			if (rollSpec.dice_count && rollSpec.dice_type) parts.push(`+${rollSpec.dice_count}d${rollSpec.dice_type}`);
-			const value = typeof sub_effect.value === "number" ? sub_effect.value : parseInt(rollSpec.fixed_val) || 0;
-			if (value) parts.push(signedText(value));
+			// Signed as when it's rolled with an attack (signedRoll)
+			const { dice_count, dice_type, sign, flat } = signedRoll(
+				sub_effect,
+				typeof sub_effect.value === "number" ? sub_effect.value : 0
+			);
+			if (dice_count) parts.push(`${sign < 0 ? "−" : "+"}${dice_count}d${dice_type}`);
+			if (flat) parts.push(signedText(flat));
 			if (typeof sub_effect.value === "object" || typeof sub_effect.value === "string") parts.push("+formula");
 			const damageType = rollSpec.damage_type || (rollSpec.damage_type_choice ? instance.choices?.damage_type : undefined);
 			let text = parts.join(" ") || describeSubEffect(sub_effect);
@@ -4575,14 +5084,14 @@ export function hitTakenDamageLines({ attackerKey, targetKey, entities = {}, def
 	for (const [holderKey, holder] of Object.entries(entities)) {
 		if (holderKey === attackerKey) continue;
 		const seen = new Set();
-		for (const [, instance] of effectEntries(holder, holderKey)) {
+		for (const [effectKey, instance] of effectEntries(holder, holderKey)) {
 			const definition = definitionOf(instance);
 			if (!definition || definition.unresolved) continue;
-			const groupKey = `${instance.source}:${instance.source_key}`;
+			const groupKey = stackKey(instance, definition, effectKey);
 			if (seen.has(groupKey)) continue;
 			const name = effectLabel(definition, instance);
 			for (const original of definition.sub_effects || []) {
-				const sub_effect = withChosenValue(original, instance);
+				const sub_effect = withChoices(original, instance);
 				if (!hitTakenDamage(sub_effect)) continue;
 				const byCaster = sub_effect.trigger_filter?.by === "caster";
 				if (byCaster ? instance.caster_key !== attackerKey : holderKey !== targetKey) continue;

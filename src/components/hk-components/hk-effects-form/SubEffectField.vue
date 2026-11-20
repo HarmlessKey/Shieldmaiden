@@ -4,13 +4,23 @@
 		<template v-if="['roll', 'duration'].includes(control.control)">
 			<template v-if="current">
 				<div class="d-flex justify-content-between items-center mb-1">
-					<span class="neutral-2">{{ control.label }}</span>
+					<span class="neutral-2">
+						{{ control.label }}
+						<template v-if="control.control === 'roll' && rollChosen">(default when applied)</template>
+						<ChoiceInfo v-if="control.control === 'roll' && !valueChosen" kind="roll" :chosen="rollChosen" />
+					</span>
 					<a class="btn btn-sm btn-clear" @click="removeBlock(value, field)">
 						<i aria-hidden="true" class="fas fa-trash-alt red" />
 						<q-tooltip anchor="top middle" self="center middle">Remove {{ lower }}</q-tooltip>
 					</a>
 				</div>
-				<DiceRollInput v-if="control.control === 'roll'" :value="current" :damage="damageRoll" />
+				<DiceRollInput
+					v-if="control.control === 'roll'"
+					:value="current"
+					:damage="damageRoll"
+					:dice="!valueChosen"
+					:modifier="!valueChosen && !rollChosen"
+				/>
 				<DurationEditor v-else :value="current" />
 			</template>
 			<a v-else class="btn btn-sm bg-neutral-5" @click="addBlock(value, field, initialBlock)">
@@ -141,6 +151,7 @@ import {
 	skillOptions,
 	srdConditionOptions,
 	isLocked,
+	DAMAGE_ROLL_TYPES,
 } from "./fieldControls";
 import { choice_kinds } from "src/utils/effectsConstants";
 import { choiceKinds } from "src/utils/effectFunctions";
@@ -237,7 +248,14 @@ export default {
 			return rules.length ? rules.join("|") : undefined;
 		},
 		damageRoll() {
-			return ["damage", "damage_modifier", "critical"].includes(this.value.type);
+			return DAMAGE_ROLL_TYPES.includes(this.value.type);
+		},
+		// The sub-effect's value or roll is chosen when applied: the Roll keeps only what's left
+		valueChosen() {
+			return choiceKinds(this.value).includes("value");
+		},
+		rollChosen() {
+			return choiceKinds(this.value).includes("roll");
 		},
 		initialBlock() {
 			return this.control.control === "duration" ? { type: "time", unit: "round" } : {};

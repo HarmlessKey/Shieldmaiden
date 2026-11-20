@@ -822,6 +822,7 @@ export const choice_kinds = keyed({
 	creature_type: { label: "Creature type", field: "creature_types" },
 	option: { label: "Option" },
 	value: { label: "Value", field: "value" },
+	roll: { label: "Roll", field: "roll" },
 });
 
 /**

@@ -438,8 +438,16 @@
 								class="linked-effects__fields"
 							>
 								<template v-for="choice in openChoices(linked)">
+									<ChosenRollInput
+										v-if="choice.kind === 'roll'"
+										:key="`${linked.key}-${choice.kind}`"
+										:value="linkAnswer(linked, choice)"
+										required
+										class="mb-1"
+										@input="setLinkChoice(linked.key, choice.kind, $event === undefined ? null : $event)"
+									/>
 									<hk-select
-										v-if="choiceField(choice).options"
+										v-else-if="choiceField(choice).options"
 										:key="`${linked.key}-${choice.kind}`"
 										:value="linkForm(linked.key).choices[choice.kind]"
 										:options="choiceField(choice).options"
@@ -452,7 +460,7 @@
 									<hk-input
 										v-else
 										:key="`${linked.key}-${choice.kind}`"
-										:value="linkForm(linked.key).choices[choice.kind]"
+										:value="linkAnswer(linked, choice)"
 										:label="`${choiceField(choice).label} *`"
 										:type="choice.kind === 'value' ? 'number' : 'text'"
 										class="mb-1"
@@ -659,6 +667,7 @@ import { experience } from "src/mixins/experience.js";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import ApplicationDuration from "src/components/hk-components/hk-effects-form/ApplicationDuration.vue";
+import ChosenRollInput from "src/components/hk-components/hk-effects-form/ChosenRollInput.vue";
 import { choiceField } from "src/components/hk-components/hk-effects-form/fieldControls";
 import { calc_mod } from "src/utils/generalFunctions";
 import { displayStats } from "src/utils/entityFunctions";
@@ -670,6 +679,8 @@ import {
 	linkApplication,
 	findSrdDefinition,
 	getRequiredChoices,
+	storedChoice,
+	validChoice,
 	getSrdDefinitions,
 } from "src/utils/effectFunctions";
 import { action_outcomes, outcomesFor } from "src/utils/effectsConstants";
@@ -680,6 +691,7 @@ export default {
 		TutorialPopover,
 		BasicEntity,
 		ApplicationDuration,
+		ChosenRollInput,
 	},
 	props: {
 		value: {
@@ -843,9 +855,9 @@ export default {
 						const definition = this.linkDefinition(linked.link);
 						const item = linkApplication(linked.link, { cast: this.roll.cast, definition });
 						const choices = { ...item.application.choices };
-						for (const kind of item.openChoices) {
-							const answer = form.choices[kind];
-							if (answer !== undefined && answer !== null && answer !== "") choices[kind] = String(answer);
+						for (const choice of this.openChoices(linked)) {
+							const answer = this.linkAnswer(linked, choice);
+							if (validChoice(choice.kind, answer)) choices[choice.kind] = storedChoice(choice.kind, answer);
 						}
 						const application = { ...item.application, choices };
 						if (!linked.link.duration) application.duration = form.duration || { type: "cancelled" };
@@ -956,6 +968,14 @@ export default {
 		setLinkForm(key, field, value) {
 			this.$set(this.linkForms, key, { ...this.linkForm(key), [field]: value });
 		},
+		/**
+		 * The card's answer to a linked effect's open choice; a roll choice starts at the
+		 * defined dice until it's changed (null: cleared)
+		 */
+		linkAnswer(linked, choice) {
+			const answer = this.linkForm(linked.key).choices[choice.kind];
+			return answer === undefined ? choice.default : answer || undefined;
+		},
 		setLinkChoice(key, kind, value) {
 			const form = this.linkForm(key);
 			this.$set(this.linkForms, key, { ...form, choices: { ...form.choices, [kind]: value } });
@@ -1015,10 +1035,10 @@ export default {
 		 */
 		linkMissing(linked) {
 			const form = this.linkForm(linked.key);
-			const missing = this.openChoices(linked).find(({ kind }) => {
-				const answer = form.choices[kind];
-				return answer === undefined || answer === null || answer === "";
-			});
+			const missing = this.openChoices(linked).find(
+				(choice) => !validChoice(choice.kind, this.linkAnswer(linked, choice))
+			);
+			if (missing?.kind === "roll") return `Enter a roll for ${linked.name}: dice with a die, a fixed value, or both`;
 			if (missing) return `Choose a ${this.choiceField(missing).label.toLowerCase()} for ${linked.name}`;
 			if (!linked.link.duration && form.durationValid === false) return `Complete the duration of ${linked.name}`;
 			return undefined;

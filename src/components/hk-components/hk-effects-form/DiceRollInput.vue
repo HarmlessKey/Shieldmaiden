@@ -1,6 +1,8 @@
 <template>
 	<div>
-		<div class="row q-col-gutter-sm">
+		<!-- A chosen value isn't rolled: no dice, fixed value or modifier -->
+		<p v-if="!dice" class="neutral-3 mb-1">The chosen value is used, so there are no dice.</p>
+		<div v-if="dice" class="row q-col-gutter-sm">
 			<div class="col-4">
 				<hk-input
 					:value="value.dice_count"
@@ -62,7 +64,7 @@
 				@input="setField(value, 'magical', $event || undefined)"
 			/>
 		</template>
-		<div class="mt-2">
+		<div v-if="modifier" class="mt-2">
 			<template v-if="value.modifier">
 				<div class="d-flex justify-content-between items-center mb-1">
 					<span class="neutral-2">Modifier added to the roll</span>
@@ -94,6 +96,10 @@ export default {
 		value: { type: Object, required: true },
 		// Show damage type fields
 		damage: { type: Boolean, default: true },
+		// Show the dice and fixed value (not with a chosen value)
+		dice: { type: Boolean, default: true },
+		// Show the modifier formula (not with a chosen value or roll, which replaces it)
+		modifier: { type: Boolean, default: true },
 	},
 	data() {
 		return { dice_types };

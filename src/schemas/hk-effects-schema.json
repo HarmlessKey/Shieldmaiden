@@ -51,8 +51,20 @@
 
 		"choice_kind": {
 			"type": "string",
-			"enum": ["ability", "damage_type", "skill", "condition", "creature_type", "option", "value"],
-			"description": "What a choice made when the effect is applied fills: abilities, damage_types, skills, conditions, creature_types, value, or a free option."
+			"enum": ["ability", "damage_type", "skill", "condition", "creature_type", "option", "value", "roll"],
+			"description": "What a choice made when the effect is applied fills: abilities, damage_types, skills, conditions, creature_types, value, roll (a chosen_roll; replaces the roll's dice, fixed value and modifier, keeps its damage type), or a free option."
+		},
+		"chosen_roll": {
+			"type": "object",
+			"description": "A roll chosen when an effect is applied or fixed on a link (choice 'roll'), like a reminder's damage: dice (count and die together), a fixed value, or both. A fixed value alone is used as the amount without dice.",
+			"properties": {
+				"dice_count": { "type": "integer", "minimum": 1, "maximum": 99 },
+				"dice_type": { "type": "integer", "minimum": 2, "maximum": 100 },
+				"fixed_val": { "type": "integer", "minimum": -999, "maximum": 999 }
+			},
+			"dependencies": { "dice_count": ["dice_type"], "dice_type": ["dice_count"] },
+			"anyOf": [{ "required": ["dice_count"] }, { "required": ["fixed_val"] }],
+			"additionalProperties": false
 		},
 
 		"damage-type-select": {
@@ -443,7 +455,8 @@
 				"save": { "$ref": "#/$defs/save_spec", "description": "Save to avoid the effect when applied." },
 				"choices": {
 					"type": "object",
-					"description": "Caster choices that parameterize the definition (Hex ability, Protection from Energy damage type, Enhance Ability ability, Bestow Curse option, Guidance skill). Sub-effects reference them with choice.",
+					"description": "Caster choices that parameterize the definition (Hex ability, Protection from Energy damage type, Enhance Ability ability, Bestow Curse option, Guidance skill). Sub-effects reference them with choice. A roll choice is a chosen_roll object, every other choice a string.",
+					"properties": { "roll": { "$ref": "#/$defs/chosen_roll" } },
 					"additionalProperties": { "type": "string" }
 				},
 				"concentration_id": { "type": "string", "description": "Links the effect to the caster's Concentration instance for cascade removal." }
@@ -459,7 +472,12 @@
 				"source": { "type": "string", "enum": ["srd", "custom", "api"] },
 				"source_key": { "type": "string" },
 				"duration": { "$ref": "#/$defs/duration" },
-				"choices": { "type": "object", "additionalProperties": { "type": "string" } },
+				"choices": {
+					"type": "object",
+					"description": "Choices made when applied, by kind: strings, a roll choice a chosen_roll object.",
+					"properties": { "roll": { "$ref": "#/$defs/chosen_roll" } },
+					"additionalProperties": { "type": "string" }
+				},
 				"caster_key": { "type": "string" },
 				"caster_name": { "type": "string", "maxLength": 200, "description": "Name of the caster when applied, shown when the caster isn't in the encounter." },
 				"applied_round": { "type": "integer", "minimum": 0 },
@@ -504,8 +522,11 @@
 				"duration": { "$ref": "#/$defs/duration" },
 				"choices": {
 					"type": "object",
-					"description": "Choices fixed by the link (a clay golem's Absorption is acid). A choice that is not set is asked when the effect is applied. A value choice is a number written as a string.",
+					"description": "Choices fixed by the link (a clay golem's Absorption is acid, a young gold dragon's Weakening Breath is 1d6). A choice that is not set is asked when the effect is applied. A value choice is a number written as a string, a roll choice a chosen_roll object.",
 					"propertyNames": { "$ref": "#/$defs/choice_kind" },
+					"properties": {
+						"roll": { "$ref": "#/$defs/chosen_roll" }
+					},
 					"additionalProperties": { "type": "string" }
 				},
 				"level": { "type": "integer", "minimum": 1, "description": "Levels applied, for an effect with a level track (2 levels of Exhaustion)." },

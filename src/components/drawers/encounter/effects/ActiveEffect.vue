@@ -22,8 +22,8 @@
 				</template>
 				<template v-for="(value, kind) in instance.choices || {}">
 					<dt :key="`choice-kind-${kind}`">{{ startCase(kind) }}</dt>
-					<!-- A chosen value keeps its sign ("-2"); startCase would drop it -->
-					<dd :key="`choice-value-${kind}`">{{ kind === "value" ? value : startCase(value) }}</dd>
+					<!-- A chosen value keeps its sign ("-2") and a roll its dice ("2d6"); startCase would change them -->
+					<dd :key="`choice-value-${kind}`">{{ choiceText(kind, value) }}</dd>
 				</template>
 				<template v-if="repeatSave">
 					<dt>Repeat save</dt>
@@ -116,6 +116,7 @@ import { mapActions, mapGetters } from "vuex";
 import BasicEntity from "src/components/combat/entities/BasicEntity.vue";
 import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
 import {
+	chosenRollText,
 	copyKey,
 	describeDuration,
 	findSrdDefinition,
@@ -371,6 +372,13 @@ export default {
 			if (!this.instance) this.setDrawer({ show: false });
 		},
 		/**
+		 * A choice as shown: a value as stored ("-2"), a roll as dice ("2d6+1"), others in words
+		 */
+		choiceText(kind, value) {
+			if (kind === "roll") return chosenRollText(value);
+			return kind === "value" ? value : startCase(value);
+		},
+		/**
 		 * A copy's rolled values in words, or its name without any
 		 */
 		copyTitle({ instance }) {
@@ -383,7 +391,7 @@ export default {
 			const parts = [instance.applied_round ? `Round ${instance.applied_round}` : this.campaign ? "Outside an encounter" : "Before combat"];
 			if (isCountingDown(instance)) parts.push(plural(instance.rounds_remaining, "round") + " left");
 			for (const [kind, value] of Object.entries(instance.choices || {})) {
-				parts.push(`${startCase(kind)}: ${kind === "value" ? value : startCase(value)}`);
+				parts.push(`${startCase(kind)}: ${this.choiceText(kind, value)}`);
 			}
 			return parts.join(" · ");
 		},

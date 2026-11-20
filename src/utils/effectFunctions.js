@@ -283,7 +283,9 @@ export function traitEffectsLabel(ability) {
 		.filter((link) => link?.effect)
 		.map((link) => {
 			const name = link.effect.name || link.effect.source_key;
-			const choices = Object.values(link.choices || {}).join(", ");
+			const choices = Object.entries(link.choices || {})
+				.map(([kind, choice]) => (kind === "roll" ? chosenRollText(choice) : choice))
+				.join(", ");
 			return choices ? `${name} (${choices})` : name;
 		})
 		.join(", ");
@@ -428,6 +430,12 @@ export function cleanEffectLink(link = {}) {
 
 	const choices = {};
 	for (const [kind, value] of Object.entries(link.choices || {})) {
+		// A roll is { dice_count, dice_type, fixed_val }; every other choice a string
+		if (kind === "roll") {
+			const roll = chosenRoll(value);
+			if (roll) choices.roll = roll;
+			continue;
+		}
 		const text = value === undefined || value === null ? "" : String(value).trim();
 		if (text !== "") choices[kind] = text;
 	}
@@ -1329,6 +1337,13 @@ export function fixChoices(definition, choices = {}) {
 			// (describeSubEffect) describes the fixed values instead
 			if (kinds.some((kind) => fixed.includes(kind))) delete copy.description;
 			for (const kind of kinds.filter((fixedKind) => fixed.includes(fixedKind))) {
+				// A fixed roll: its dice in the sub-effect's roll, which keeps its damage type
+				if (kind === "roll") {
+					const chosen = withChosenRoll({ ...copy, choice: "roll" }, { choices });
+					for (const key of Object.keys(copy)) if (!(key in chosen)) delete copy[key];
+					Object.assign(copy, chosen);
+					continue;
+				}
 				const field = CHOICE_FIELDS[kind];
 				if (field) copy[field] = field === "value" ? choices[kind] : [choices[kind]];
 			}
@@ -1352,7 +1367,8 @@ export function fixChoices(definition, choices = {}) {
  * Collected from `choice` on sub-effects and `damage_type_choice` on rolls.
  *
  * @param {object} definition Effect definition
- * @returns {{ kind: string, options?: string[] }[]} One entry per choice kind
+ * @returns {{ kind: string, options?: string[], default?: object }[]} One entry per choice kind;
+ *   a roll choice's default is the first defined dice ({ dice_count: 1, dice_type: 4 })
  */
 export function getRequiredChoices(definition) {
 	const choices = {};
@@ -1376,6 +1392,10 @@ export function getRequiredChoices(definition) {
 				if (kind === "damage_type" && sub_effect.damage_types?.length) {
 					addChoice(kind, sub_effect.damage_types);
 				} else addChoice(kind);
+				// A roll choice offers the defined dice
+				if (kind === "roll" && !choices.roll.default && defaultRoll(sub_effect)) {
+					choices.roll.default = defaultRoll(sub_effect);
+				}
 			}
 			if (Array.isArray(sub_effect.roll?.damage_type_choice)) {
 				addChoice("damage_type", sub_effect.roll.damage_type_choice);
@@ -2396,6 +2416,137 @@ export function withChosenValue(sub_effect, instance) {
 	return chosen === undefined || chosen === "" ? rest : { ...rest, value: chosen };
 }
 
+/**
+ * A chosen roll as stored: { dice_count, dice_type, fixed_val }, like a reminder's damage.
+ * Dice need a count of 1 to 99 and a die of 2 to 100, given together; the fixed value is a
+ * whole number and can be the whole roll ({ fixed_val: 5 }). Numeric strings are read as
+ * numbers.
+ *
+ * @param {object} choice The entered or stored roll
+ * @returns {{ dice_count?: number, dice_type?: number, fixed_val?: number }|undefined} The
+ *   cleaned roll (no fixed_val of 0 next to dice), undefined when it isn't a roll
+ */
+export function chosenRoll(choice) {
+	if (!choice || typeof choice !== "object") return undefined;
+	const number = (value) => (value === undefined || value === null || value === "" ? undefined : Number(value));
+	const dice_count = number(choice.dice_count);
+	const dice_type = number(choice.dice_type);
+	const fixed_val = number(choice.fixed_val);
+	if (fixed_val !== undefined && !Number.isInteger(fixed_val)) return undefined;
+	const hasDice = dice_count !== undefined || dice_type !== undefined;
+	if (hasDice) {
+		if (!Number.isInteger(dice_count) || dice_count < 1 || dice_count > 99) return undefined;
+		if (!Number.isInteger(dice_type) || dice_type < 2 || dice_type > 100) return undefined;
+		return fixed_val ? { dice_count, dice_type, fixed_val } : { dice_count, dice_type };
+	}
+	return fixed_val === undefined ? undefined : { fixed_val };
+}
+
+/**
+ * A chosen roll in words: "2d6+1", "1d4", "5"
+ *
+ * @param {object} choice
+ * @returns {string} Empty when it isn't a roll
+ */
+export function chosenRollText(choice) {
+	const roll = chosenRoll(choice);
+	if (!roll) return "";
+	if (!roll.dice_count) return String(roll.fixed_val);
+	return rollText({ dice_count: roll.dice_count, dice_type: roll.dice_type, fixed_val: roll.fixed_val || 0 });
+}
+
+/**
+ * A sub-effect's defined dice, the default of its roll choice: { dice_count, dice_type,
+ * fixed_val }; undefined without dice
+ *
+ * @param {object} sub_effect
+ * @returns {object|undefined}
+ */
+export function defaultRoll(sub_effect) {
+	const roll = sub_effect?.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : undefined;
+	const dice_count = parseInt(roll?.dice_count);
+	const dice_type = parseInt(roll?.dice_type);
+	if (!dice_count || !dice_type) return undefined;
+	return chosenRoll({ dice_count, dice_type, fixed_val: parseInt(roll.fixed_val) || undefined });
+}
+
+/**
+ * The dice of a sub-effect's defined roll in words, the default of a roll choice: "1d4",
+ * "2d6+1"; undefined without dice
+ *
+ * @param {object} sub_effect
+ * @returns {string|undefined}
+ */
+export function rollNotation(sub_effect) {
+	const roll = defaultRoll(sub_effect);
+	return roll ? chosenRollText(roll) : undefined;
+}
+
+/**
+ * A sub-effect with its chosen roll (choice "roll"): the chosen dice replace the roll's
+ * dice, fixed value and modifier, and keep its damage type and magical. A whole number becomes
+ * the value, without dice. Without a (valid) chosen roll it has no roll amount and no value,
+ * so it does nothing.
+ *
+ * @param {object} sub_effect
+ * @param {object} instance Active effect instance (choices.roll)
+ * @returns {object} New object when changed, the input otherwise
+ */
+export function withChosenRoll(sub_effect, instance) {
+	if (!choiceKinds(sub_effect).includes("roll")) return sub_effect;
+	const parsed = chosenRoll(instance?.choices?.roll);
+	const { value, roll, ...rest } = sub_effect; // eslint-disable-line no-unused-vars
+	// eslint-disable-next-line no-unused-vars
+	const { dice_count, dice_type, fixed_val, modifier, ...kept } = roll && typeof roll === "object" ? roll : {};
+	const keptRoll = Object.keys(kept).length ? { roll: kept } : {};
+	if (!parsed) return { ...rest, ...keptRoll };
+	if (parsed.dice_count === undefined) return { ...rest, ...keptRoll, value: parsed.fixed_val };
+	const chosen = { ...kept, dice_count: parsed.dice_count, dice_type: parsed.dice_type };
+	if (parsed.fixed_val) chosen.fixed_val = parsed.fixed_val;
+	return { ...rest, roll: chosen };
+}
+
+/**
+ * Whether a choice entered when applying or on a link is valid: a value is a number (it can
+ * be negative), a roll dice and/or a fixed value (chosenRoll), anything else not empty
+ *
+ * @param {string} kind Choice kind
+ * @param {*} choice The entered choice
+ * @returns {boolean}
+ */
+export function validChoice(kind, choice) {
+	if (kind === "roll") return !!chosenRoll(choice);
+	if (choice === undefined || choice === null || choice === "") return false;
+	if (kind === "value") return Number.isFinite(Number(choice));
+	return true;
+}
+
+/**
+ * A valid choice as stored in `choices`: strings, a value as a number ("2"), a roll as
+ * { dice_count, dice_type, fixed_val }
+ *
+ * @param {string} kind Choice kind
+ * @param {*} choice A valid choice
+ * @returns {string|object}
+ */
+export function storedChoice(kind, choice) {
+	if (kind === "value") return String(Number(choice));
+	if (kind === "roll") return chosenRoll(choice);
+	return choice;
+}
+
+/**
+ * A sub-effect with every choice of the instance that changes its amount: the chosen value
+ * and the chosen roll
+ *
+ * @param {object} sub_effect
+ * @param {object} instance Active effect instance
+ * @returns {object}
+ */
+export function withChoices(sub_effect, instance) {
+	return withChosenRoll(withChosenValue(sub_effect, instance), instance);
+}
+
 function flatFormulaVars({ vars = {}, instance = {}, event = {} }) {
 	const flat = Object.create(null);
 	for (const [name, value] of Object.entries(vars.self || {})) flat[name] = value;
@@ -2422,7 +2573,10 @@ function amountRoll(sub_effect, flat) {
 	let dice_count = 0;
 	let dice_type;
 	let fixed_val = 0;
-	if (roll) {
+	// A roll with only a damage type or magical (a chosen whole number) leaves the amount to the value
+	const rollAmount =
+		roll && (roll.dice_count !== undefined || roll.fixed_val !== undefined || roll.modifier !== undefined);
+	if (rollAmount || (roll && sub_effect.value === undefined)) {
 		dice_count = parseInt(roll.dice_count) || 0;
 		dice_type = parseInt(roll.dice_type) || undefined;
 		fixed_val = parseInt(roll.fixed_val) || 0;
@@ -2526,7 +2680,9 @@ export function rollEffectValues({ definition, instance = {}, vars = {}, random 
 	if (!definition || definition.unresolved) return { rolled_values, rolls };
 	const flat = flatFormulaVars({ vars, instance });
 	const level = parseInt(instance.level) || 1;
-	(definition.sub_effects || []).forEach((sub_effect, index) => {
+	(definition.sub_effects || []).forEach((original, index) => {
+		// A chosen roll is rolled like a defined one
+		const sub_effect = withChoices(original, instance);
 		if (!isRolledValue(sub_effect)) return;
 		if (sub_effect.min_level !== undefined && level < sub_effect.min_level) return;
 		if (sub_effect.max_level !== undefined && level > sub_effect.max_level) return;
@@ -2622,7 +2778,7 @@ export function alsoHealAmount({ instance = {}, definition, vars = {} }) {
 	const level = parseInt(instance.level) || 1;
 	let amount = 0;
 	for (const [index, original] of (definition.sub_effects || []).entries()) {
-		const sub_effect = withChosenValue(original, instance);
+		const sub_effect = withChoices(original, instance);
 		if (sub_effect.type !== "bonus" || !sub_effect.also_heal) continue;
 		if (!sub_effect.sub_types?.includes("max_hp")) continue;
 		if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
@@ -2770,7 +2926,7 @@ export function applyNotices({ instance = {}, definition, holderName } = {}) {
 		(sub_effect.max_level === undefined || level <= sub_effect.max_level);
 	const notices = [];
 	for (const original of definition.sub_effects || []) {
-		const sub_effect = withChosenValue(original, instance);
+		const sub_effect = withChoices(original, instance);
 		if (!atLevel(sub_effect)) continue;
 		const text = sub_effect.description || describeSubEffect(sub_effect);
 		if (sub_effect.type === "fixed" && sub_effect.sub_types?.includes("temp_hp") && !sub_effect.trigger) {
@@ -2821,7 +2977,7 @@ export function tempHpParts({ sub_effects = [], instance = {}, event = {}, vars 
 				(sub_effect.max_level === undefined || level <= sub_effect.max_level)
 		)
 		.map((sub_effect) => {
-			const { dice_count, dice_type, fixed_val, notes } = amountRoll(withChosenValue(sub_effect, instance), flat);
+			const { dice_count, dice_type, fixed_val, notes } = amountRoll(withChoices(sub_effect, instance), flat);
 			return {
 				dice_count,
 				dice_type,
@@ -2889,7 +3045,7 @@ export function effectRollParts({
 		const dealerKey = !otherParty && casterPresent ? instance.caster_key : holderKey;
 
 		const { dice_count, dice_type, fixed_val, magical, notes } = amountRoll(
-			withChosenValue(sub_effect, instance),
+			withChoices(sub_effect, instance),
 			flat
 		);
 		const addMissing = (missing) => {
@@ -3118,7 +3274,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 		flat.level = level;
 
 		for (const [index, original] of (definition.sub_effects || []).entries()) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (!NUMERIC_TYPES.includes(sub_effect.type)) continue;
 			const fields = [
 				...new Set((sub_effect.sub_types || []).flatMap((sub_type) => statFields(sub_type, sub_effect, instance, entity))),
@@ -3601,7 +3757,7 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 
 		const entries = [];
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			const type = sub_effect.type;
 			const sub_types = sub_effect.sub_types || [];
 			if (isAttack && type === "critical") {
@@ -4004,7 +4160,7 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 
 		let found = false;
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect.type !== "bonus" || !(sub_effect.sub_types || []).includes("damage")) continue;
 			if (sub_effect.perspective === "against") continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
@@ -4067,7 +4223,7 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 
 		let found = false;
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (!hitTakenDamage(sub_effect) || !hitTakenBy(sub_effect, instance, attackerKey)) continue;
 			if (sub_effect.min_level !== undefined && level < sub_effect.min_level) continue;
 			if (sub_effect.max_level !== undefined && level > sub_effect.max_level) continue;
@@ -4276,7 +4432,7 @@ export function damageModifiers({ entity, holderKey, entities = {}, definitionOf
 	for (const active of activeDefinitions({ entity, holderKey, entities, definitionOf, counterpartKey })) {
 		const { effectKey, instance, definition, ctx, name, definitionState } = active;
 		(definition.sub_effects || []).forEach((original, index) => {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect?.type !== "damage_modifier" || sub_effect.trigger) return;
 			if ((sub_effect.direction || "incoming") !== "incoming") return;
 			if (!subEffectInPlay(sub_effect, active)) return;
@@ -4603,7 +4759,7 @@ export function healingReceivedCap({ entity, holderKey, entities = {}, definitio
 	for (const active of activeDefinitions({ entity, holderKey, entities, definitionOf })) {
 		const { definition, instance, ctx, name, definitionState } = active;
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect?.type !== "cap" || sub_effect.trigger) continue;
 			if (!(sub_effect.sub_types || []).includes("healing_received")) continue;
 			if (!subEffectInPlay(sub_effect, active)) continue;
@@ -4638,7 +4794,7 @@ export function damageBonusLines({ entity, definitionOf = () => undefined } = {}
 		if (seen.has(groupKey)) continue;
 		const name = effectLabel(definition, instance);
 		for (const original of definition.sub_effects || []) {
-			const sub_effect = withChosenValue(original, instance);
+			const sub_effect = withChoices(original, instance);
 			if (sub_effect.type !== "bonus" || !(sub_effect.sub_types || []).includes("damage")) continue;
 			if (sub_effect.perspective === "against") continue;
 			const rollSpec = sub_effect.roll && typeof sub_effect.roll === "object" ? sub_effect.roll : {};
@@ -4688,7 +4844,7 @@ export function hitTakenDamageLines({ attackerKey, targetKey, entities = {}, def
 			if (seen.has(groupKey)) continue;
 			const name = effectLabel(definition, instance);
 			for (const original of definition.sub_effects || []) {
-				const sub_effect = withChosenValue(original, instance);
+				const sub_effect = withChoices(original, instance);
 				if (!hitTakenDamage(sub_effect)) continue;
 				const byCaster = sub_effect.trigger_filter?.by === "caster";
 				if (byCaster ? instance.caster_key !== attackerKey : holderKey !== targetKey) continue;

@@ -17,7 +17,7 @@ import {
 	check_values,
 	sizes,
 } from "src/utils/effectsConstants";
-import { choiceKinds, describeSubEffect } from "src/utils/effectFunctions";
+import { choiceKinds, describeSubEffect, rollNotation } from "src/utils/effectFunctions";
 
 const label = (entries, value) => entries[value]?.label || String(value).replace(/_/g, " ");
 const lower = (text) => (text ? text.charAt(0).toLowerCase() + text.slice(1) : text);
@@ -214,7 +214,9 @@ const SUB_EFFECT_SUMMARIES = {
 		if (!kinds.length) return { text: "Choose what is picked when the effect is applied.", incomplete: true };
 		const names = kinds.map((kind) => lower(label(choice_kinds, kind)));
 		const verb = kinds.length > 1 ? "are" : "is";
-		return { text: `The ${list(names)} ${verb} chosen when the effect is applied.` };
+		// A roll choice offers the defined roll
+		const preset = kinds.includes("roll") && rollNotation(sub_effect) ? ` The roll defaults to ${rollNotation(sub_effect)}.` : "";
+		return { text: `The ${list(names)} ${verb} chosen when the effect is applied.${preset}` };
 	},
 	save(sub_effect) {
 		const save = sub_effect.save || {};

@@ -42,7 +42,41 @@ drift; one key keeps the rule in one spot.
 Two instances show as two lines with the same name ("Strength Drain: −3", "Strength Drain:
 −2"). The rolled value in the line already tells them apart, so no numbering is added.
 
+### 3. Copies share a chip
+
+`effectChipItems` groups its entries by `source:source_key:caster_key` (an empty caster key
+for none), keeping the order of the first copy. A group of one is the chip it is now. A
+larger group gets `count`, `effectKeys` (newest first) and `effectKey` = the newest copy;
+"newest" is the highest Firebase push key, which sorts by creation time. Its `value` is the
+lowest badge of its copies, so a timed group shows the copy that ends first.
+
+The grouping is for every effect, not only Independent ones: two copies of a non-stacking
+effect from one caster are just as confusing as two chips, and the engine already picks the
+copy that counts. It isn't the same key as `stackKey`, which groups across casters.
+
+`Effect.vue` shows `×{{ count }}` in the empty bottom-left corner (the badge is top-left, the
+initial bottom-right) and "N copies" in the tooltip.
+
+### 4. The detail view finds the copies itself
+
+`ActiveEffect.vue` keeps getting `{ entityKey, effectKey }` (or the campaign form). It finds
+the other copies from the entity's live `effects` with the same grouping key, so they stay
+right when a copy is added or removed while the drawer is open. A local `selectedKey`
+(starting at `data.effectKey`) decides which copy the details show; Remove on a copy removes
+that key, and when the shown one is gone it moves to the newest remaining copy, or closes when
+none remain. Each copy's line shows its applied round, rounds left, choices and rolled values
+(the rolled values via the existing tooltip text, e.g. "Strength −3").
+
+Rejected: passing the group's keys in the drawer data. They'd be stale as soon as a copy is
+added or removed.
+
 ## Risks / Trade-offs
+
+- [`effect-duplicates` also changes the chip requirements] → It modifies "Chips show a badge
+  and a tooltip"; this change modifies "Effect chips are shown on combatants" and adds a new
+  requirement, so archiving them in either order keeps both.
+- [The live view groups too] → It uses `effectChipItems`, so players see "×2" as well. Its
+  chips are read-only, so only the chip changes there.
 
 - [A place that groups by definition is missed] → The tasks list each one found with a grep
   for `source_key}` in `effectFunctions.js`, and the scratchpad test covers stats, roll

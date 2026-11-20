@@ -16,9 +16,12 @@
 			<i aria-hidden="true" class="fas fa-sparkles generic" />
 			<span class="initial">{{ effect.initial }}</span>
 		</template>
+		<!-- Copies of one effect from one caster share the chip -->
+		<span v-if="effect.count > 1" class="count">×{{ effect.count }}</span>
 		<q-tooltip anchor="top middle" self="center middle">
 			{{ effect.title }}
 			<template v-if="effect.type === 'effect'">
+				<div v-if="effect.count > 1" class="neutral-2">{{ effect.count }} copies</div>
 				<div class="neutral-2">{{ effect.duration }}</div>
 				<div v-if="effect.caster" class="neutral-2">from {{ effect.caster }}</div>
 			</template>
@@ -117,6 +120,15 @@ export default {
 				bottom: 0;
 				line-height: 14px;
 				font-size: 11px;
+				font-weight: bold;
+				color: $neutral-1;
+			}
+			.count {
+				position: absolute;
+				left: 3px;
+				bottom: 0;
+				line-height: 14px;
+				font-size: 10px;
 				font-weight: bold;
 				color: $neutral-1;
 			}

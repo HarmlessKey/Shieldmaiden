@@ -239,9 +239,14 @@ until you reset them. A trait effect without a limit is never used up. Players' 
 ## Effects in combat
 
 - **Effect chips**: every creature shows its effects as chips, with a badge for the Exhaustion
-  level or the rounds left. The tooltip shows the duration and the caster.
+  level or the rounds left. The tooltip shows the duration and the caster. When a creature has
+  the same effect from the same caster more than once (a Shadow's Strength Drain after two
+  hits), the copies share one chip with "×2" in its corner, and the badge shows the copy that
+  ends first.
 - **Detail view**: click a chip to read the effect, see its duration, change the Exhaustion
-  level, roll a repeat save or an escape, and remove it. Every effect can be removed.
+  level, roll a repeat save or an escape, and remove it. Every effect can be removed. For a
+  chip with copies, the detail view lists every copy with its round, rounds left and rolled
+  values ("Strength −3"). Click a copy to see it, or remove copies one by one.
 - **Changed values**: values changed by effects, like AC and Speed, are marked. Their tooltip
   lists the effects and manual bonuses that change them.
 - **Bonuses drawer**: click a value on a creature's card, like AC or Speed, to see its manual
@@ -632,7 +637,10 @@ What happens when the effect is applied to a creature that already has it.
 - **Doesn't stack** (default): the stronger or longer instance is kept.
 - **Adds a level**: applying it again raises its level (Exhaustion). Needs a level track.
 - **Replaces**: the new instance replaces the old one.
-- **Independent**: every instance applies separately.
+- **Independent**: every instance applies separately, each with its own choices, level and
+  rolled values. A Shadow's Strength Drain lowers Strength again with every hit: two hits
+  that rolled 3 and 2 take a Strength of 16 to 11, and the tooltip lists both. This counts
+  everywhere: effective stats, d20 rolls, damage bonuses and damage modifiers.
 - **Instances from different casters are different effects**: Hunter's Mark from two
   rangers counts twice.
 

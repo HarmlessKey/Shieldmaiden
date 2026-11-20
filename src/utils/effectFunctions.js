@@ -915,6 +915,7 @@ export async function resolveDefinition({ source, sourceKey, lookup }) {
 			description: definition.description,
 			ends_when: definition.ends_when,
 			condition: definition.condition,
+			stacking: definition.stacking,
 			sub_effects,
 		};
 	};
@@ -1205,15 +1206,29 @@ export function effectBadge(instance) {
  * @param {string} holderName Its name as shown, if any
  * @param {function} casterOf instance => { name, label } of the caster as shown, or undefined:
  *   name for the duration text, label for the "from" line
- * @returns {object[]} { type, key, effectKey, entityKey, icon, initial, title, value, duration, caster }
+ * @returns {object[]} { type, key, effectKey, entityKey, icon, initial, title, value, duration, caster },
+ *   plus { count, effectKeys } for copies of one effect from one caster, which share a chip:
+ *   effectKey is the newest copy, effectKeys all copies newest first, value the lowest badge
  */
 export function effectChipItems(entries = [], { entityKey, holderName, casterOf = () => undefined } = {}) {
-	return entries.map(({ key, instance, definition }) => {
+	const groups = new Map();
+	for (const entry of entries) {
+		const id = copyKey(entry.instance);
+		if (!groups.has(id)) groups.set(id, []);
+		groups.get(id).push(entry);
+	}
+	return [...groups.values()].map((copies) => {
+		// Push keys sort by creation time: the newest copy is the highest key
+		const sorted = [...copies].sort((a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0));
+		const { key, instance, definition } = sorted[0];
 		const name = definition?.name || instance.name || "";
 		const title = name.charAt(0).toUpperCase() + name.slice(1);
 		const isCondition = isSrdCondition(instance.source, instance.source_key);
+		const badges = sorted.map((copy) => effectBadge(copy.instance)).filter((badge) => badge !== undefined);
+		// The copy that ends first gives the badge and the duration
+		const first = sorted.find((copy) => effectBadge(copy.instance) === Math.min(...badges)) || sorted[0];
 		const caster = casterOf(instance);
-		return {
+		const item = {
 			type: "effect",
 			key: `effect:${key}`,
 			effectKey: key,
@@ -1221,11 +1236,27 @@ export function effectChipItems(entries = [], { entityKey, holderName, casterOf 
 			icon: isCondition ? instance.source_key : undefined,
 			initial: title.charAt(0),
 			title,
-			value: effectBadge(instance),
-			duration: describeDuration(instance, { casterName: caster?.name, holderName }),
+			value: badges.length ? Math.min(...badges) : undefined,
+			duration: describeDuration(first.instance, { casterName: caster?.name, holderName }),
 			caster: caster?.label,
 		};
+		if (sorted.length > 1) {
+			item.count = sorted.length;
+			item.effectKeys = sorted.map((copy) => copy.key);
+		}
+		return item;
 	});
+}
+
+/**
+ * Key shared by copies of the same effect from the same caster on one entity, which share a
+ * chip and are listed together in the detail view
+ *
+ * @param {object} instance Active effect instance
+ * @returns {string}
+ */
+export function copyKey(instance = {}) {
+	return `${instance.source}:${instance.source_key}:${instance.caster_key || ""}`;
 }
 
 /**
@@ -2528,25 +2559,52 @@ function rollText({ dice_count, dice_type, fixed_val }) {
  * @returns {string[]}
  */
 export function rolledValueNotices(rolls = [], effectName = "", instance = {}) {
+	return rolls.map(
+		(roll) => `${effectName}: ${rollText(roll)} = ${roll.total}, ${rolledChangeText(roll.sub_effect, roll.total, instance)}`
+	);
+}
+
+/**
+ * What a rolled total does to its stats: "Strength −3", "Armor Class at least 12"
+ *
+ * @param {object} sub_effect The rolled sub-effect
+ * @param {number} total Its rolled total
+ * @param {object} instance The instance, for a chosen ability
+ * @returns {string}
+ */
+function rolledChangeText(sub_effect, total, instance = {}) {
 	const chosenAbility = instance.choices?.ability;
-	return rolls.map((roll) => {
-		const { sub_effect } = roll;
-		const multiplier = typeof sub_effect.multiplier === "number" ? sub_effect.multiplier : 1;
-		const amount = Math.floor(roll.total * multiplier);
-		const targets = (sub_effect.sub_types || [])
-			.filter((sub_type) => STAT_SUB_TYPES.includes(sub_type))
-			.flatMap((sub_type) =>
-				sub_type === "ability_score"
-					? [...(sub_effect.abilities || []), ...(chosenAbility ? [chosenAbility] : [])].map(
-							(ability) => BONUS_LABELS[ability] || ability
-					  )
-					: [BONUS_LABELS[sub_type] || sub_type]
-			);
-		const change =
-			sub_effect.type === "bonus" ? (amount < 0 ? `−${Math.abs(amount)}` : `+${amount}`) : `${amount}`;
-		const verb = { base: "base ", fixed: "set to ", floor: "at least ", cap: "at most " }[sub_effect.type] || "";
-		return `${effectName}: ${rollText(roll)} = ${roll.total}, ${targets.map((target) => `${target} ${verb}${change}`).join(", ")}`;
-	});
+	const multiplier = typeof sub_effect.multiplier === "number" ? sub_effect.multiplier : 1;
+	const amount = Math.floor(total * multiplier);
+	const targets = (sub_effect.sub_types || [])
+		.filter((sub_type) => STAT_SUB_TYPES.includes(sub_type))
+		.flatMap((sub_type) =>
+			sub_type === "ability_score"
+				? [...(sub_effect.abilities || []), ...(chosenAbility ? [chosenAbility] : [])].map(
+						(ability) => BONUS_LABELS[ability] || ability
+				  )
+				: [BONUS_LABELS[sub_type] || sub_type]
+		);
+	const change = sub_effect.type === "bonus" ? (amount < 0 ? `−${Math.abs(amount)}` : `+${amount}`) : `${amount}`;
+	const verb = { base: "base ", fixed: "set to ", floor: "at least ", cap: "at most " }[sub_effect.type] || "";
+	return targets.map((target) => `${target} ${verb}${change}`).join(", ");
+}
+
+/**
+ * The stored rolled values of an instance in words, one per rolled sub-effect: ["Strength −3"]
+ *
+ * @param {object} instance Active effect instance
+ * @param {object} definition Its resolved definition
+ * @returns {string[]}
+ */
+export function rolledValueTexts(instance = {}, definition) {
+	if (!instance.rolled_values || !definition?.sub_effects) return [];
+	return definition.sub_effects
+		.map((sub_effect, index) => {
+			const total = instance.rolled_values[subEffectKey(sub_effect, index)];
+			return total === undefined ? undefined : rolledChangeText(sub_effect, total, instance);
+		})
+		.filter(Boolean);
 }
 
 /**
@@ -3010,6 +3068,20 @@ function bucket(map, key, make = () => []) {
 }
 
 /**
+ * Key that groups the instances of one definition on an entity, so the same definition counts
+ * once. With stacking.mode "independent" (Strength Drain) every instance gets its own key and
+ * counts.
+ *
+ * @param {object} instance
+ * @param {object} definition Resolved definition of the instance
+ * @param {string} effectKey Key of the instance on the entity
+ */
+export function stackKey(instance, definition, effectKey) {
+	const key = `${instance.source}:${instance.source_key}`;
+	return definition?.stacking?.mode === "independent" ? `${key}#${effectKey}` : key;
+}
+
+/**
  * Effective values of an entity from the numeric sub-effects of its active effects.
  * Stored values aren't changed; only fields whose value differs are returned.
  *
@@ -3035,7 +3107,7 @@ export function effectiveStats({ entity, holderKey, entities = {}, definitionOf 
 		if (!definition || definition.unresolved) continue;
 
 		const name = effectLabel(definition, instance);
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		const level = parseInt(instance.level) || 1;
 		const ctx = { holderKey, instance, entities, definitionOf };
 		const definitionActive = !definition.condition || evaluateConditionSet(definition.condition, ctx);
@@ -3263,10 +3335,10 @@ export function effectiveDefenses({ entity, holderKey, entities = {}, definition
 	};
 
 	const seen = new Set();
-	for (const [, instance] of effectEntries(entity, holderKey)) {
+	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 
@@ -3611,7 +3683,7 @@ export function rollModifiers({ entity, holderKey, entities = {}, definitionOf =
 			}
 			entries.push(entry);
 		}
-		if (entries.length) contributions.push({ groupKey: `${instance.source}:${instance.source_key}`, effectKey, entries });
+		if (entries.length) contributions.push({ groupKey: stackKey(instance, definition, effectKey), effectKey, entries });
 	}
 
 	// The same definition more than once: only the instance with the most entries counts
@@ -3754,6 +3826,49 @@ export function concentrationSaveDc(sub_effect, damage) {
 const signedText = (value) => (value < 0 ? `−${Math.abs(value)}` : `+${value}`);
 
 /**
+ * Bonus texts added up for a short summary: dice of the same size and sign are counted
+ * together and flat values summed, per damage type. ["−1d4", "−1d4", "+2"] → ["−2d4 +2"],
+ * ["+1d6 necrotic", "+1d4", "+1d6 necrotic"] → ["+2d6 necrotic", "+1d4"]. A text that isn't
+ * only dice, numbers and a type ("+formula") is kept as it is, after the others.
+ *
+ * @param {string[]} texts
+ * @returns {string[]}
+ */
+export function combineBonusTexts(texts = []) {
+	const groups = new Map();
+	const rest = [];
+	for (const text of texts) {
+		const match = String(text).trim().match(/^((?:[+−-]\s*\d+(?:d\d+)?\s*)+)([a-z_ ]*)$/i);
+		if (!match) {
+			rest.push(text);
+			continue;
+		}
+		const type = match[2].trim();
+		if (!groups.has(type)) groups.set(type, { flat: 0, dice: new Map() });
+		const group = groups.get(type);
+		for (const [, sign, count, die] of match[1].matchAll(/([+−-])\s*(\d+)(?:d(\d+))?/g)) {
+			const factor = sign === "+" ? 1 : -1;
+			if (die) {
+				const key = `${factor}:${die}`;
+				group.dice.set(key, (group.dice.get(key) || 0) + Number(count));
+			} else {
+				group.flat += factor * Number(count);
+			}
+		}
+	}
+	const combined = [];
+	for (const [type, { flat, dice }] of groups) {
+		const parts = [...dice].map(([key, count]) => {
+			const [factor, die] = key.split(":");
+			return `${Number(factor) < 0 ? "−" : "+"}${count}d${die}`;
+		});
+		if (flat) parts.push(signedText(flat));
+		if (parts.length) combined.push(`${parts.join(" ")}${type ? ` ${type}` : ""}`);
+	}
+	return [...combined, ...rest];
+}
+
+/**
  * Turns roll modifiers into what a roll needs: the modifier with the flat bonuses, the
  * Advantage object (effects and the DM's choice; both cancel), bonus dice, an automatic
  * result, and note lines for the result and tooltips
@@ -3862,10 +3977,10 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 
 	const selfVars = formulaVars(attacker);
 	const seen = new Set();
-	for (const [, instance] of effectEntries(attacker, attackerKey)) {
+	for (const [effectKey, instance] of effectEntries(attacker, attackerKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 
 		const name = effectLabel(definition, instance);
@@ -3925,10 +4040,10 @@ export function damageBonuses({ attackerKey, targetKey, attackType, entities = {
 	// The target's damage when this attacker hits it (Hex, Hunter's Mark), rolled with the attack
 	const target = entities[targetKey];
 	const seenOnTarget = new Set();
-	for (const [, instance] of target && targetKey !== attackerKey ? effectEntries(target, targetKey) : []) {
+	for (const [effectKey, instance] of target && targetKey !== attackerKey ? effectEntries(target, targetKey) : []) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seenOnTarget.has(groupKey)) continue;
 
 		const name = effectLabel(definition, instance);
@@ -4008,10 +4123,10 @@ export function restrictions({ entity, holderKey, entities = {}, definitionOf = 
 	const result = [];
 	if (!entity) return result;
 	const seen = new Set();
-	for (const [, instance] of effectEntries(entity, holderKey)) {
+	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 
@@ -4114,7 +4229,7 @@ function activeDefinitions({ entity, holderKey, entities, definitionOf, counterp
 	for (const [effectKey, instance] of effectEntries(entity, holderKey)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		seen.add(groupKey);
 		const ctx = { holderKey, instance, entities, definitionOf, counterpartKey };
@@ -4294,6 +4409,7 @@ export function applyDamageModifiers({ parts = [], modifiers = {}, active = {}, 
 		for (const { target, used } of taken) {
 			const entry = { name: part.name, amount: used, rolled: -amount, limited: left > 0 };
 			if (part.dice) entry.dice = part.dice;
+			if (part.throws?.length) entry.throws = part.throws;
 			target.penalties = [...(target.penalties || []), entry];
 		}
 		part.subtracted = -amount - left;
@@ -4518,7 +4634,7 @@ export function damageBonusLines({ entity, definitionOf = () => undefined } = {}
 	for (const [effectKey, instance] of effectEntries(entity)) {
 		const definition = definitionOf(instance);
 		if (!definition || definition.unresolved) continue;
-		const groupKey = `${instance.source}:${instance.source_key}`;
+		const groupKey = stackKey(instance, definition, effectKey);
 		if (seen.has(groupKey)) continue;
 		const name = effectLabel(definition, instance);
 		for (const original of definition.sub_effects || []) {
@@ -4565,10 +4681,10 @@ export function hitTakenDamageLines({ attackerKey, targetKey, entities = {}, def
 	for (const [holderKey, holder] of Object.entries(entities)) {
 		if (holderKey === attackerKey) continue;
 		const seen = new Set();
-		for (const [, instance] of effectEntries(holder, holderKey)) {
+		for (const [effectKey, instance] of effectEntries(holder, holderKey)) {
 			const definition = definitionOf(instance);
 			if (!definition || definition.unresolved) continue;
-			const groupKey = `${instance.source}:${instance.source_key}`;
+			const groupKey = stackKey(instance, definition, effectKey);
 			if (seen.has(groupKey)) continue;
 			const name = effectLabel(definition, instance);
 			for (const original of definition.sub_effects || []) {

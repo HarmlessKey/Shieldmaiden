@@ -1,8 +1,31 @@
 import { dice } from "src/mixins/dice.js";
+import { restrictionsMixin } from "src/mixins/restrictions.js";
 import { mapActions, mapGetters } from "vuex";
+import { findSrdDefinition, linkApplication } from "src/utils/effectFunctions";
+
+// Action types with a to-hit roll
+const ATTACK_ACTION_TYPES = ["melee_weapon", "ranged_weapon", "spell_attack"];
+
+/**
+ * A spell cast as its roll carries it (effects 7): the spell, the slot, the caster's level and
+ * spell save DC
+ *
+ * @param {object} spell The rolled spell, with its key
+ * @param {object} config rollAction's config: cast_level, caster_level, save_dc
+ * @returns {object} { spell: { key, name, level, scaling }, castLevel, casterLevel, saveDc }
+ */
+export function spellCast(spell = {}, config = {}) {
+	const toNumber = (value) => (Number.isFinite(parseInt(value)) ? parseInt(value) : undefined);
+	return {
+		spell: { key: spell.key, name: spell.name, level: toNumber(spell.level), scaling: spell.scaling },
+		castLevel: toNumber(config.cast_level),
+		casterLevel: toNumber(config.caster_level),
+		saveDc: toNumber(config.save_dc),
+	};
+}
 
 export const runEncounter = {
-	mixins: [dice],
+	mixins: [dice, restrictionsMixin],
 	computed: {
 		...mapGetters(["entities", "broadcast"]),
 		_share() {
@@ -23,13 +46,118 @@ export const runEncounter = {
 		 * @param {array|object} targets array of keys or object with { [key]: projectile_count }
 		 * @param {string} option if an action/spell has options, this is the selected option
 		 */
-		roll_action({ e, action_index, action, category, entity, targets, option = undefined }) {
+		roll_action(args) {
+			// Restricted (Stunned, Slow's reactions, Charmed against the charmer): the DM confirms
+			const { action, category, entity, targets } = args;
+			const actionList = action.action_list || action.actions || [];
+			this.confirmRestrictions({
+				entity,
+				targets: Array.isArray(targets) ? targets : Object.keys(targets || {}),
+				category,
+				attack: actionList.some(({ type }) => ATTACK_ACTION_TYPES.includes(type)),
+			}).then((confirmed) => {
+				if (confirmed) this.doRollAction(args);
+			});
+		},
+		/**
+		 * A spell's roll config: spell attack and save DC as changed by the caster's active
+		 * effects, the caster's level, and the level it's cast at (innate spells at their
+		 * assigned level, falling back to the lowest possible level)
+		 */
+		spellConfig({ action, action_index, category, entity }) {
+			const caster = this.$store.getters.effective_entity?.(entity.key) || entity;
+			return {
+				attack_bonus: caster[`${category}_spell_attack`],
+				caster_level: entity[`${category}_level`],
+				save_dc: caster[`${category}_save_dc`],
+				cast_level: category === "innate" ? (action.cast_level ?? action.level) : action_index,
+			};
+		},
+		/**
+		 * Casts a spell that only applies effects (applyOnlySpell, effects 7): like a roll it
+		 * confirms restrictions, uses the reaction out of turn and the slot, then applies its
+		 * linked effects to every target without a roll card. A link that leaves a choice open
+		 * or has no duration makes it a roll, so the roll card asks for them.
+		 *
+		 * @param {number} action_index Spell level (caster) or spell key (innate), for limited uses
+		 * @param {object} action The spell, with its key
+		 * @param {string} category innate | caster
+		 * @param {object} entity The caster
+		 * @param {string[]} targets Keys of the targets
+		 */
+		async apply_spell({ e, action_index, action, category, entity, targets = [] }) {
+			const confirmed = await this.confirmRestrictions({ entity, targets, category, attack: false });
+			if (!confirmed) return;
+
+			const config = this.spellConfig({ action, action_index, category, entity });
+			const cast = spellCast(action, config);
+			const edition = this.$store.getters.edition || "5.5e";
+			const uid = this.$store.getters.user?.uid;
+			const items = [];
+			for (const spellAction of action.actions || []) {
+				for (const link of spellAction?.effects?.always || []) {
+					const effect = link.effect || {};
+					let definition;
+					if (effect.source === "srd") {
+						definition =
+							findSrdDefinition(edition, effect.source_key) ||
+							findSrdDefinition(edition === "5e" ? "5.5e" : "5e", effect.source_key);
+					} else if (effect.source === "custom" && uid) {
+						definition = await this.$store
+							.dispatch("effects/get_effect", { uid, id: effect.source_key })
+							.catch(() => undefined);
+					}
+					const item = linkApplication(link, { cast, definition });
+					// Something to ask: the roll card asks for it
+					if (item.openChoices.length || !link.duration) {
+						return this.doRollAction({ e, action_index, action, category, entity, targets });
+					}
+					items.push({ ...item, definition: definition || undefined });
+				}
+			}
+
+			this.$store
+				.dispatch("use_reaction", { actorKey: entity?.key, category })
+				.catch((error) => console.error(error));
+			if (action.limit || action.recharge || action_index) {
+				this.set_limitedUses({ key: entity.key, index: action_index, category });
+			}
+			for (const targetKey of targets) {
+				await this.$store.dispatch("apply_linked_effects", {
+					targetKey,
+					casterKey: entity.key,
+					items,
+					cast,
+				});
+			}
+			const names = targets.map((key) => (this.entities[key]?.name || "").capitalizeEach()).join(", ");
+			this.$q.notify({
+				message: `${(action.name || "").capitalizeEach()} applied`,
+				caption: names,
+				color: "positive",
+				position: "top",
+				timeout: 1500,
+			});
+		},
+		/**
+		 * Rolls an action or spell (roll_action without the restriction check)
+		 */
+		doRollAction({ e, action_index, action, category, entity, targets, option = undefined }) {
 			let roll;
 			const is_spell = ["innate", "caster"].includes(category);
 			const config = {
 				type: is_spell ? "spell" : "monster_action",
 				option,
+				// For the attacker's and target's effects on attack rolls (rollAction)
+				attackerKey: entity?.key,
+				// Single-use modifiers used by earlier rolls of this action (projectiles, targets)
+				consumed: [],
 			};
+
+			// Acting out of turn uses the actor's reaction (once, however many targets)
+			this.$store
+				.dispatch("use_reaction", { actorKey: entity?.key, category })
+				.catch((error) => console.error(error));
 
 			// Create projectile object if target = array
 			if (Array.isArray(targets)) {
@@ -38,14 +166,10 @@ export const runEncounter = {
 
 			if (is_spell) {
 				action.action_list = action.actions;
-				config.attack_bonus = entity[`${category}_spell_attack`];
-				config.caster_level = entity[`${category}_level`];
-				config.save_dc = entity[`${category}_save_dc`];
-
-				// Innate spells are cast at their assigned level, falling back to the lowest possible level
-				config.cast_level =
-					category === "innate" ? (action.cast_level ?? action.level) : action_index;
+				Object.assign(config, this.spellConfig({ action, action_index, category, entity }));
 			}
+			// The spell cast, for applying its linked effects: scaling, save DC, Concentration (effects 7)
+			const cast = is_spell ? spellCast(action, config) : undefined;
 
 			// Roll once for AOE
 			if (action.aoe_type) {
@@ -76,13 +200,14 @@ export const runEncounter = {
 
 					// Reroll for each target if it's not AOE
 					if (!action.aoe_type || action.aoe_type === "none") {
-						newRoll = this.rollAction(e, action, config);
+						newRoll = this.rollAction(e, action, { ...config, targetKey: key });
 						if (this._share) this.shareRoll(newRoll, entity, [key]);
 					}
 
 					// Set the target and current
 					this.$set(newRoll, "target", this.entities[key]);
 					this.$set(newRoll, "current", entity);
+					if (cast) this.$set(newRoll, "cast", cast);
 
 					this.setActionRoll(newRoll);
 				}

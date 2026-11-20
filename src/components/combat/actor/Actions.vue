@@ -56,6 +56,7 @@
 import ActionsDropdown from "./ActionsDropdown.vue";
 import RollActions from "../actions/RollActions.vue";
 import LimitedUseCounter from "../actions/LimitedUseCounter.vue";
+import { hasRolls } from "src/utils/generalFunctions";
 
 export default {
 	name: "ActorActions",
@@ -87,12 +88,7 @@ export default {
 		available_types() {
 			const types = [];
 			for (const action_type of Object.keys(this.action_types)) {
-				if (
-					this.actor[action_type]?.find(
-						(action) =>
-							action?.action_list?.[0]?.type !== "other" && action?.action_list?.[0]?.rolls?.length
-					)
-				) {
+				if (this.actor[action_type]?.find(hasRolls)) {
 					types.push(action_type);
 				}
 			}

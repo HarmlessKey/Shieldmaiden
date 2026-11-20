@@ -19,7 +19,9 @@
 				@click.stop="setHP('tempHp', editable_entity.tempHp)"
 			/>
 		</hk-input>
+		<!-- The transformed pool keeps its own single modifier -->
 		<hk-input
+			v-if="entity.transformed"
 			v-model="editable_entity.maxHpMod"
 			dense
 			label="Max HP Mod"
@@ -27,7 +29,7 @@
 			color="white"
 			@keydown.enter="setHP('maxHpMod', editable_entity.maxHpMod)"
 		>
-			<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green" />
+			<q-icon slot="prepend" name="fas fa-paw-claws green" />
 			<q-icon slot="prepend" size="xs" name="fas fa-plus" />
 			<q-btn
 				slot="after"
@@ -38,6 +40,9 @@
 				@click.stop="setHP('maxHpMod', editable_entity.maxHpMod)"
 			/>
 		</hk-input>
+		<button v-else class="btn btn-sm btn-block bg-neutral-5" @click.stop="openBonuses('max_hp')">
+			<i aria-hidden="true" class="fas fa-plus mr-1" /> Max HP bonuses
+		</button>
 		<hr />
 		<hk-input
 			v-model="editable_entity.curHp"
@@ -96,7 +101,15 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions(["edit_entity_prop"]),
+		...mapActions(["edit_entity_prop", "setDrawer"]),
+		openBonuses(stat) {
+			this.$refs.popup.hide();
+			this.setDrawer({
+				show: true,
+				type: "drawers/encounter/StatBonuses",
+				data: { entityKey: this.entity.key, stat },
+			});
+		},
 		setHP(prop, value) {
 			if (prop === "curHp" && value === undefined) {
 				return;

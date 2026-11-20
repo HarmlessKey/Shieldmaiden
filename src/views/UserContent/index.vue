@@ -134,8 +134,8 @@ export default {
 				{
 					path: "/content/reminders",
 					label: "Reminders",
-					icon: "fas fa-stopwatch",
-					caption: "Your custom reminders",
+					icon: "fas fa-bell",
+					caption: "Deprecated: view your old reminders",
 				},
 				{
 					path: "/content/items",

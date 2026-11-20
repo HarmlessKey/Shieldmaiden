@@ -127,7 +127,7 @@ function npcTypeSettings(entity, label) {
 		{ key: "name", entity, name: "Name", icon: "fas fa-helmet-battle", info: `Players can see the names of ${label}.`, options: SHOW_HIDE },
 		{ key: "health", entity, name: "Health", icon: "fas fa-heart", info: `Players can see the health of ${label}.`, options: NPC_HEALTH },
 		{ key: "ac", entity, name: "Armor Class", icon: "fas fa-shield", info: `Players can see the armor class of ${label}.`, options: NPC_AC },
-		{ key: "conditions", entity, name: "Conditions", icon: "fas fa-flame", info: `Players can see the conditions on ${label}.`, options: SHOW_HIDE },
+		{ key: "conditions", entity, name: "Conditions and effects", icon: "fas fa-flame", info: `Players can see the conditions and effects on ${label}.`, options: SHOW_HIDE },
 	];
 }
 
@@ -155,7 +155,7 @@ export default {
 					type_settings: [
 						{ key: "health", entity: "player", name: "Health", icon: "fas fa-heart", info: "Players can see the health of players.", options: PLAYER_HEALTH },
 						{ key: "ac", entity: "player", name: "Armor Class", icon: "fas fa-shield", info: "Players can see the armor class of players.", options: SHOW_HIDE },
-						{ key: "conditions", entity: "player", name: "Conditions", icon: "fas fa-flame", info: "Players can see the conditions of players.", options: SHOW_HIDE },
+						{ key: "conditions", entity: "player", name: "Conditions and effects", icon: "fas fa-flame", info: "Players can see the conditions and effects of players.", options: SHOW_HIDE },
 						{ key: "hide_death_saves", entity: "player", name: "Death Saves", icon: "fas fa-skull-crossbones", info: "Players can see the death saves/fails of other players.", options: DEATH_SAVES },
 					],
 				},

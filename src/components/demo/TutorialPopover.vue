@@ -128,6 +128,11 @@ export default {
 			"get_tutorial_progress",
 		]),
 		...mapGetters(["targeted"]),
+		...mapGetters("encounters", ["demo_edition"]),
+		// The demo's start modal shows on /demo until an edition is chosen (layouts/demo.vue)
+		startModalOpen() {
+			return this.$route.name === "DemoBuildEncounter" && !this.demo_edition;
+		},
 		isMobile() {
 			// This only works for real mobiles, not for small desktop screens
 			return this.$q.platform.is.mobile;
@@ -178,7 +183,8 @@ export default {
 					return this.stepSetter;
 				}
 
-				if (!this.follow_tutorial) {
+				// Not while the demo's start modal is open (no edition chosen yet on /demo)
+				if (!this.follow_tutorial || this.startModalOpen) {
 					return false;
 				}
 

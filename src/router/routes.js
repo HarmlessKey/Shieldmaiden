@@ -15,6 +15,14 @@ const RunEncounter = () => import("src/views/RunEncounter.vue");
 const EncounterBuilder = () => import("src/views/UserContent/Encounters/EditEncounter.vue");
 const User = () => import("src/views/User.vue");
 
+import { custom_effects_released } from "src/utils/generalConstants";
+
+// Until custom effects are released, their form goes to the overview's "coming soon" notice
+const customEffectsReleased = (to, from, next) => {
+	if (custom_effects_released) next();
+	else next("/content/effects");
+};
+
 // This is where you add all your site routes
 // Each route is set as an object in the array
 // For a the most basic route just set
@@ -396,6 +404,50 @@ const routes = [
 				],
 			},
 
+			// Effects
+			{
+				path: "effects",
+				component: {
+					render(c) {
+						return c("router-view");
+					},
+				},
+				meta: {
+					title: "Effects",
+				},
+				children: [
+					{
+						path: "",
+						name: "Effects",
+						component: () => import("src/views/UserContent/Effects"),
+						meta: {
+							title: "Effects",
+							description: "Your custom effects for Harmless Key.",
+						},
+					},
+					{
+						path: "add-effect",
+						name: "Add effect",
+						component: () => import("src/views/UserContent/Effects/EditEffect.vue"),
+						beforeEnter: customEffectsReleased,
+						meta: {
+							title: "Add effect",
+							description: "Add a new effect on Harmless Key.",
+						},
+					},
+					{
+						path: ":id",
+						name: "Edit effect",
+						component: () => import("src/views/UserContent/Effects/EditEffect.vue"),
+						beforeEnter: customEffectsReleased,
+						meta: {
+							title: "Edit effect",
+							description: "Edit an existing effect Harmless Key.",
+						},
+					},
+				],
+			},
+
 			// Reminders
 			{
 				path: "reminders",
@@ -421,18 +473,20 @@ const routes = [
 						path: "add-reminder",
 						name: "Add reminder",
 						component: () => import("src/views/UserContent/Reminders/EditReminder.vue"),
+						// Personal reminders are deprecated (effects 9): this only shows the notice
 						meta: {
-							title: "Add reminder",
-							description: "Add a new reminder on Shieldmaiden.",
+							title: "Reminders",
+							description: "Personal reminders on Shieldmaiden.",
 						},
 					},
 					{
 						path: ":id",
 						name: "Edit reminder",
 						component: () => import("src/views/UserContent/Reminders/EditReminder.vue"),
+						// Read-only since personal reminders are deprecated (effects 9)
 						meta: {
-							title: "Edit reminder",
-							description: "Edit an existing reminder Shieldmaiden.",
+							title: "Reminder",
+							description: "A personal reminder on Shieldmaiden.",
 						},
 					},
 				],
@@ -1557,6 +1611,26 @@ const routes = [
 			title: "Documentation",
 			description: "Documentation for Shieldmaiden, a Combat Tracker for D&D.",
 		},
+	},
+	{
+		path: "/documentation/effects",
+		component: () => import("src/layouts/default"),
+		meta: {
+			offline: true,
+			title: "How effects work",
+		},
+		children: [
+			{
+				path: "",
+				name: "Effects documentation",
+				component: () => import("src/views/Pages/EffectsDocumentation"),
+				meta: {
+					title: "How effects work",
+					description:
+						"How to build custom effects in Shieldmaiden: sub-effects, triggers, saves, conditions, formulas and durations.",
+				},
+			},
+		],
 	},
 	{
 		path: "/support",

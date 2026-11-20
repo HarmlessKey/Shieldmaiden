@@ -211,6 +211,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "effects": {
+            "title": "Effects",
+            "description": "Effects linked to this action, by outcome: $defs/action_effects of the effects schema (hk-effects-schema.json). on_fail / on_success use the action's save ability and the caster's spell save DC; links can scale with the spell's scaling type.",
+            "$ref": "https://harmlesskey.com/schemas/hk-effects-schema.json#/$defs/action_effects"
+          },
           "name": {
             "type": "string",
             "maxLength": 100

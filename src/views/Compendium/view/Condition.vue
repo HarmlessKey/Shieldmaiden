@@ -3,7 +3,7 @@
 		<template v-if="!loading">
 			<div slot="header" class="card-header">
 				<h1>
-					<i aria-hidden="true" :class="`hki-${condition.name.toLowerCase()}`" />
+					<i aria-hidden="true" :class="`hki-${condition.url}`" />
 					{{ condition.name }}
 					<span v-if="!not_found" class="neutral-2">{{ editionLabel }}</span>
 				</h1>

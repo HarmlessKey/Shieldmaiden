@@ -178,7 +178,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { remindersMixin } from "src/mixins/reminders";
 import Menu from "../top/Menu.vue";
 import TutorialPopover from "src/components/demo/TutorialPopover.vue";
 
@@ -188,7 +187,6 @@ export default {
 		Menu,
 		TutorialPopover,
 	},
-	mixins: [remindersMixin],
 	props: ["active_len", "current", "next", "settings"],
 	data() {
 		return {
@@ -220,7 +218,6 @@ export default {
 
 		startEncounter() {
 			this.set_turn({ turn: 0, round: 1 });
-			this.checkReminders(this.next, "startTurn");
 		},
 		nextTurn() {
 			let turn = this.encounter.turn + 1;
@@ -233,7 +230,6 @@ export default {
 			}
 			this.set_turn({ turn, round });
 			this.set_targeted({ type: "untarget", key: "all" });
-			this.checkReminders(this.current, "endTurn");
 		},
 		prevTurn() {
 			let turn = this.encounter.turn - 1;

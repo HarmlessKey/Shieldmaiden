@@ -9,16 +9,42 @@
 				</div>
 				<div>
 					<div class="truncate label value__label">Save DC</div>
-					<div class="value">{{ entity.caster_save_dc }}</div>
+					<div
+						class="value"
+						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
+						@click="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.enter="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_save_dc')"
+					>
+						<EffectModifiedValue
+							:entity="entity"
+							field="caster_save_dc"
+							:value="entity.caster_save_dc"
+						/>
+					</div>
 				</div>
 				<div>
 					<div class="truncate label value__label">Attack</div>
-					<div class="value">
-						{{
-							entity.caster_spell_attack > 0
-								? `+${entity.caster_spell_attack}`
-								: entity.caster_spell_attack
-						}}
+					<div
+						class="value"
+						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
+						@click="in_encounter && openBonuses('spell_attack')"
+						@keydown.enter="in_encounter && openBonuses('spell_attack')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_attack')"
+					>
+						<EffectModifiedValue
+							:entity="entity"
+							field="caster_spell_attack"
+							:value="
+								entity.caster_spell_attack > 0
+									? `+${entity.caster_spell_attack}`
+									: entity.caster_spell_attack
+							"
+						/>
 					</div>
 				</div>
 			</div>
@@ -68,16 +94,42 @@
 				</div>
 				<div>
 					<div class="truncate label value__label">Save DC</div>
-					<div class="value">{{ entity.innate_save_dc }}</div>
+					<div
+						class="value"
+						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
+						@click="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.enter="in_encounter && openBonuses('spell_save_dc')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_save_dc')"
+					>
+						<EffectModifiedValue
+							:entity="entity"
+							field="innate_save_dc"
+							:value="entity.innate_save_dc"
+						/>
+					</div>
 				</div>
 				<div>
 					<div class="truncate label value__label">Attack</div>
-					<div class="value">
-						{{
-							entity.innate_spell_attack > 0
-								? `+${entity.innate_spell_attack}`
-								: entity.innate_spell_attack
-						}}
+					<div
+						class="value"
+						:class="{ clickable: in_encounter }"
+						:tabindex="in_encounter ? 0 : undefined"
+						:role="in_encounter ? 'button' : undefined"
+						@click="in_encounter && openBonuses('spell_attack')"
+						@keydown.enter="in_encounter && openBonuses('spell_attack')"
+						@keydown.space.prevent="in_encounter && openBonuses('spell_attack')"
+					>
+						<EffectModifiedValue
+							:entity="entity"
+							field="innate_spell_attack"
+							:value="
+								entity.innate_spell_attack > 0
+									? `+${entity.innate_spell_attack}`
+									: entity.innate_spell_attack
+							"
+						/>
 					</div>
 				</div>
 			</div>
@@ -124,12 +176,14 @@
 import { mapGetters } from "vuex";
 import Spell from "src/components/compendium/Spell.vue";
 import { default_edition } from "src/utils/generalConstants";
+import EffectModifiedValue from "../EffectModifiedValue.vue";
 
 export default {
 	name: "CardDetails",
 	mixins: [],
 	components: {
 		Spell,
+		EffectModifiedValue,
 	},
 	props: {
 		entity: {
@@ -144,6 +198,10 @@ export default {
 	},
 	computed: {
 		...mapGetters(["broadcast", "targeted"]),
+		// Bonuses can only be edited for entities in the running encounter
+		in_encounter() {
+			return !!this.$store.getters.entities?.[this.entity.key];
+		},
 		is_5_5e() {
 			return this.entity.edition === "5.5e";
 		},
@@ -185,6 +243,13 @@ export default {
 		},
 	},
 	methods: {
+		openBonuses(stat) {
+			this.$store.dispatch("setDrawer", {
+				show: true,
+				type: "drawers/encounter/StatBonuses",
+				data: { entityKey: this.entity.key, stat },
+			});
+		},
 		spellsForLevel(level) {
 			return Object.entries(this.entity.caster_spells)
 				.filter(([, item]) => item.level == level)
@@ -198,3 +263,13 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.stats .value.clickable {
+	cursor: pointer;
+
+	&:hover {
+		background-color: $neutral-4;
+	}
+}
+</style>

@@ -41,6 +41,7 @@
 					:players="players"
 					:npcs="npcs"
 					:displaySettings="displaySettings"
+					:effective="effectiveEntities && effectiveEntities[current.key]"
 				/>
 				<template
 					v-else-if="
@@ -56,11 +57,11 @@
 							aria-hidden="true"
 							class="fas"
 							:class="{
-								'green fa-heart': percentage(current.curHp, current.maxHp) == 100,
+								'green fa-heart': percentage(current.curHp, currentMaxHp) == 100,
 								'orange fa-heart-broken':
-									percentage(current.curHp, current.maxHp) < 100 &&
-									percentage(current.curHp, current.maxHp) > 33,
-								'red fa-heartbeat': percentage(current.curHp, current.maxHp) <= 33,
+									percentage(current.curHp, currentMaxHp) < 100 &&
+									percentage(current.curHp, currentMaxHp) > 33,
+								'red fa-heartbeat': percentage(current.curHp, currentMaxHp) <= 33,
 							}"
 						></i>
 					</span>
@@ -112,11 +113,17 @@ export default {
 		"npcs",
 		"displaySettings",
 		"timer",
+		// Entities with the values effects and manual bonuses give them, by key
+		"effectiveEntities",
 	],
 	computed: {
 		playerSettings() { return this.displaySettings?.player || {}; },
 		npcSettings() { return this.displaySettings?.npc; },
 		allySettings() { return this.displaySettings?.ally; },
+		// The current entity's maximum hit points with effects and manual bonuses
+		currentMaxHp() {
+			return this.effectiveEntities?.[this.current?.key]?.maxHp ?? this.current?.maxHp;
+		},
 	},
 	data() {
 		return {

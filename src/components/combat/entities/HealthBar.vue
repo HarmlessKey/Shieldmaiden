@@ -3,13 +3,13 @@
 		<div class="health-bar__main" :style="{ width: `${main}%` }">
 			<div class="health-bar__main-current" :style="{ width: `${current}%` }" :class="mainColor" />
 			<div
-				v-if="entity.maxHpMod"
+				v-if="maxHpMod"
 				class="health-bar__main-modifier"
-				:class="{ negative: entity.maxHpMod < 0 }"
+				:class="{ negative: maxHpMod < 0 }"
 				:style="{ width: `${modifier}%` }"
 			>
 				<q-tooltip anchor="top middle" self="center middle"
-					>Max HP {{ entity.maxHpMod > 0 ? `+${entity.maxHpMod}` : entity.maxHpMod }}</q-tooltip
+					>Max HP {{ maxHpMod > 0 ? `+${maxHpMod}` : maxHpMod }}</q-tooltip
 				>
 			</div>
 		</div>
@@ -34,14 +34,22 @@ export default {
 		displayStats,
 	},
 	computed: {
+		/**
+		 * What effects and manual bonuses add to the stored maximum.
+		 * entity is the effective entity: maxHp is effective, stored.maxHp the stored maximum
+		 */
+		maxHpMod() {
+			const stored = this.entity.stored?.maxHp;
+			return stored === undefined ? 0 : this.entity.maxHp - stored;
+		},
 		max() {
-			return this.entity.maxHp + (this.entity.maxHpMod || 0);
+			return this.entity.maxHp;
 		},
 		current() {
 			return (this.entity.curHp / this.entity.maxHp) * 100;
 		},
 		modifier() {
-			return (Math.abs(this.entity.maxHpMod) / this.entity.maxHp) * 100;
+			return (Math.abs(this.maxHpMod) / this.entity.maxHp) * 100;
 		},
 		temporary() {
 			return (this.entity.tempHp / this.max) * 100;

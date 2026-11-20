@@ -282,6 +282,10 @@
 						to find errors in your imported JSON.<br />
 						Paste our schema in the left field and the JSON of your imported JSON in the right.
 					</p>
+					<p v-if="schemaType === 'npcs'">
+						The <code>effects</code> of an action follow <code>$defs/action_effects</code> of our
+						effects schema (<code>hk-effects-schema.json</code>), which this schema refers to.
+					</p>
 					<a class="btn btn-sm mb-2" @click="copySchema">Copy schema</a>
 					<h3>HK Schema</h3>
 					<div class="bg-neutral-8 px-2 py-2 overflow-auto">
@@ -302,12 +306,15 @@ import campaignSchema from "src/schemas/hk-campaign-schema.json";
 import encounterSchema from "src/schemas/hk-encounter-schema.json";
 import npcSchema from "src/schemas/hk-npc-schema.json";
 import spellSchema from "src/schemas/hk-spell-schema.json";
+import effectsSchema from "src/schemas/hk-effects-schema.json";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import DuplicateOptions from "./importer/DuplicateOptions";
 
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv, ["uri"]);
+// The NPC schema refers to the effects schema for the effects linked to actions
+ajv.addSchema(effectsSchema);
 
 export default {
 	name: "ImportUserContent",
@@ -325,6 +332,7 @@ export default {
 			json_input: this.jsonInput ? JSON.stringify(this.jsonInput, null, 2) : undefined,
 			showSchema: false,
 			schema: undefined,
+			schemaType: undefined,
 			import_state: "start",
 			failed_imports: {
 				campaigns: [],
@@ -452,6 +460,7 @@ export default {
 		]),
 		showSchemaDialog(schema_type) {
 			this.showSchema = true;
+			this.schemaType = schema_type;
 			switch (schema_type) {
 				case "npcs":
 					this.schema = npcSchema;

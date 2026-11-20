@@ -1,35 +1,17 @@
 <template>
-	<div>
-		<i>{{ condition.condition }}</i>
-
-		<ul v-if="condition.effects">
-			<li v-for="(effect, index) in condition.effects" :key="index">
-				{{ effect }}
-			</li>
-		</ul>
-
-		<!-- EXHAUSTION -->
-		<table v-if="condition.name == 'Exhaustion'" class="table">
-			<thead>
-				<th>Level</th>
-				<th>Effect</th>
-			</thead>
-			<tbody>
-				<tr v-for="(effect, index) in exhaustionLevels" :key="index">
-					<td>{{ index + 1 }}</td>
-					<td>{{ effect }}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+	<!-- A v2 condition is an effect definition: shown as in the Effects drawer (effects 12) -->
+	<EffectDetails :definition="condition" :edition="resolvedEdition" />
 </template>
 
 <script>
 	import { mapActions } from "vuex";
-	import { EXHAUSTION_LEVELS } from "src/utils/generalConstants.js";
+	import EffectDetails from "src/components/drawers/encounter/effects/EffectDetails.vue";
 
 	export default {
 		name: "Condition",
+		components: {
+			EffectDetails,
+		},
 		props: {
 			// If the condition is fetched in a parent component you can send the full condition object in de data prop
 			data: {
@@ -46,16 +28,13 @@
 		},
 		data() {
 			return {
-				condition: {},
+				condition: undefined,
 				loading: true,
 			}
 		},
 		computed: {
 			resolvedEdition() {
 				return this.edition || (this.$route.params.edition === "5.5e" ? "5.5e" : "5e");
-			},
-			exhaustionLevels() {
-				return EXHAUSTION_LEVELS[this.resolvedEdition];
 			},
 		},
 		async beforeMount() {
@@ -72,19 +51,3 @@
 		}
 	};
 </script>
-
-<style lang="scss" scoped>
-	ul {
-		margin-top: 20px;
-		padding-left: 20px;
-
-		li {
-			margin-bottom: 20px;
-		}
-
-		&.exhaustion {
-			list-style: none;
-			padding: 0;
-		}
-	}
-</style>

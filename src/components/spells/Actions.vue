@@ -98,7 +98,7 @@
 										Validation errors
 									</q-tooltip>
 								</q-item-section>
-								<q-item-section>{{ action.name }}</q-item-section>
+								<q-item-section class="truncate">{{ actionHeader(action) }}</q-item-section>
 								<q-item-section avatar>
 									<a @click.stop="remove_action(action_index)" class="remove">
 										<i aria-hidden="true" class="fas fa-trash-alt red" />
@@ -132,10 +132,10 @@
 								</div>
 								<div class="row q-col-gutter-md">
 									<!-- ACTION TYPE -->
-									<div class="col-12 col-md-6">
+									<div class="col">
 										<ValidationProvider
 											rules="required"
-											name="Attack type"
+											name="Action type"
 											v-slot="{ errors, invalid, validated }"
 										>
 											<q-select
@@ -144,7 +144,7 @@
 												square
 												map-options
 												emit-value
-												label="Attack type"
+												label="Action type"
 												:options="Object.values(attack_types)"
 												v-model="action.type"
 												class="mb-2"
@@ -155,8 +155,8 @@
 										</ValidationProvider>
 									</div>
 
-									<!-- SAVE -->
-									<div class="col-12 col-md-6">
+									<!-- SAVE: only for a save, like the NPC form -->
+									<div v-if="action.type === 'save'" class="col">
 										<q-select
 											:dark="$store.getters.theme === 'dark'"
 											filled
@@ -166,30 +166,38 @@
 											label="Save ability"
 											:options="abilities"
 											v-model="action.save_ability"
-											:disable="action.type !== 'save'"
 											class="mb-2"
 											@input="$forceUpdate()"
 										/>
 									</div>
 								</div>
 
-								<!-- ROLLS -->
-								<div class="d-flex justify-content-between mb-2">
-									<span><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span>
-									<a class="btn btn-sm bg-neutral-5" @click="newRoll(action, action_index)">
-										<i aria-hidden="true" class="fas fa-plus green"></i>
-										<span class="d-none d-md-inline ml-1">Add</span>
-										<q-tooltip anchor="top middle" self="center middle">Add roll</q-tooltip>
-									</a>
+								<!-- ROLLS: the NPC form's rolls header -->
+								<div class="mt-3 rolls">
+									<label class="group justify-content-between mb-0">
+										<span><i aria-hidden="true" class="fas fa-dice-d20" /> Rolls</span>
+										<a class="btn btn-sm btn-clear" @click="newRoll(action, action_index)">
+											<i aria-hidden="true" class="fas fa-plus green"></i>
+											<span class="d-none d-md-inline ml-1">Add roll</span>
+										</a>
+									</label>
+									<hk-action-rolls-table
+										v-if="action.rolls"
+										:rolls="action.rolls"
+										:scaling="spell.scaling"
+										:level="spell.level"
+										:type="action.type"
+										@edit="editRoll($event, action, action_index)"
+										@delete="deleteRoll($event, action_index)"
+									/>
 								</div>
-								<hk-action-rolls-table
-									v-if="action.rolls"
-									:rolls="action.rolls"
-									:scaling="spell.scaling"
-									:level="spell.level"
-									:type="action.type"
-									@edit="editRoll($event, action, action_index)"
-									@delete="deleteRoll($event, action_index)"
+
+								<!-- EFFECTS: linked like NPC actions, with scaling (effects 6c) -->
+								<ActionEffects
+									:value="action"
+									:spell="spell"
+									:edition="spell.edition"
+									@change="$forceUpdate()"
 								/>
 							</div>
 						</q-expansion-item>
@@ -254,9 +262,12 @@
 <script>
 import { abilities } from "src/utils/generalConstants";
 import { attack_types } from "src/utils/actionConstants";
+import { actionCounts } from "src/utils/generalFunctions";
+import ActionEffects from "src/components/hk-components/hk-effects-form/ActionEffects.vue";
 
 export default {
 	name: "spells-Actions",
+	components: { ActionEffects },
 	props: {
 		value: Object,
 	},
@@ -285,6 +296,22 @@ export default {
 	},
 
 	methods: {
+		/**
+		 * One-line header of an action's collapse item, like the NPC form's: its name, type, the
+		 * save ability for a save (a spell has no DC of its own), and how many rolls and effects
+		 *
+		 * @param {object} action spell action
+		 * @returns {string} e.g. "Paralyze · Save · WIS · 1 effect"
+		 */
+		actionHeader(action) {
+			const parts = [action.name, attack_types[action.type]?.label].filter(Boolean);
+			if (action.type === "save" && action.save_ability) {
+				parts.push(action.save_ability.substring(0, 3).toUpperCase());
+			}
+			const counts = actionCounts(action);
+			if (counts) parts.push(counts);
+			return parts.join(" · ");
+		},
 		parseToInt(value, object, property) {
 			if (value === undefined || value === "") {
 				this.$delete(object, property);
@@ -293,8 +320,9 @@ export default {
 			}
 		},
 		add_action() {
+			// $set, so the list and the actions pushed to it are reactive
 			if (this.spell.actions == undefined) {
-				this.spell.actions = [];
+				this.$set(this.spell, "actions", []);
 			}
 			this.spell.actions.push({
 				type: "spell_attack",
@@ -333,6 +361,11 @@ export default {
 			this.edit_index = undefined;
 			this.action_index = undefined;
 			this.roll_dialog = false;
+		},
+		deleteRoll(roll_index, action_index) {
+			const action = this.spell.actions[action_index];
+			this.$delete(action.rolls, roll_index);
+			if (!action.rolls.length) this.$delete(action, "rolls");
 		},
 		cancelRoll() {
 			this.roll_dialog = false;
@@ -373,3 +406,14 @@ export default {
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+// Like the NPC form's section labels (Rolls)
+label.group {
+	display: flex;
+	line-height: 30px;
+	margin-bottom: 10px;
+	border-bottom: solid 1px $neutral-5;
+	width: 100%;
+}
+</style>

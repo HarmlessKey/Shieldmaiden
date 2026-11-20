@@ -1,0 +1,491 @@
+# effects-srd-data Specification
+
+## Purpose
+
+Defines the SRD effect and condition definitions the HK API serves for the rules editions (5e /
+2014 and 5.5e / 2024), which the effects engine resolves by `source: "srd"` + `url`
+against the campaign's edition: one effect list shared by both editions, where `edition`
+marks the entries that follow one edition's rules, and the 15 SRD conditions per edition.
+
+## Requirements
+
+### Requirement: SRD definitions exist per edition with a shared url
+
+The SRD effect and condition definitions SHALL be served by the HK API per edition, at
+`/v2/effects/5e` and `/v2/effects/5.5e`. An edition's list holds:
+- the effects of that edition's rules
+- the effects used in both editions, which the API marks `edition: "generic"`
+- that edition's conditions, which the API marks `is_condition: true`
+
+The app SHALL read the generic effects as effects without `edition`. It SHALL read the
+conditions as that edition's condition list, without `edition`. It SHALL NOT bundle SRD
+effect or condition lists of its own.
+
+An effect definition that follows one edition's rules SHALL have `edition` set to that
+edition and SHALL only be used in campaigns of that edition. An effect definition without
+`edition` SHALL be used in campaigns of both editions. An edition's set of definitions is the
+effects without `edition`, the effects with that `edition`, and that edition's conditions.
+
+Every definition SHALL be identified by its `url`: the same unique identifier the HK API
+uses for its content, not the API's uuid `_id`. It SHALL NOT carry a separate `key`. The app
+SHALL drop the API's `_id` and `is_condition`. A definition that exists in both editions
+SHALL use the same `url` in both editions. Within an edition's set, a `url` SHALL occur at
+most once. So an effect without `edition` SHALL NOT share its `url` with an edition-specific
+effect or a condition. Active effect instances SHALL reference a definition by
+`source: "srd"` and a `source_key` equal to its `url`.
+
+Every definition SHALL validate against `src/schemas/hk-effects-schema.json`. It SHALL NOT
+carry duration fields (`duration_type`, `duration_value`, `cancel_trigger`), origin fields
+(`category`, `spell_level`, `magical`, `tags`, `removed_by`, `area`) or `cancelable`. No
+sub-effect SHALL carry `scaling`. Conditions SHALL NOT carry `edition` in the app: their
+list already belongs to one edition.
+
+#### Scenario: Concentration is resolvable in both editions
+- **WHEN** an effect instance with `source: "srd"` and `source_key: "concentration"` is resolved for a `"5e"` campaign and for a `"5.5e"` campaign
+- **THEN** each edition's set returns exactly one definition with `url: "concentration"`, the one with that campaign's `edition`
+
+#### Scenario: A condition is resolvable in both editions by the same url
+- **WHEN** an effect instance with `source: "srd"` and `source_key: "prone"` is resolved for a `"5e"` campaign and for a `"5.5e"` campaign
+- **THEN** each edition's set returns exactly one definition with `url: "prone"`, found in that edition's condition list
+
+#### Scenario: An effect without edition is in both sets
+- **WHEN** the sets of both editions are searched for `url: "reaction-used"`
+- **THEN** each finds the same single definition, which has no `edition` (the API's `"generic"`)
+
+#### Scenario: urls are unique within an edition
+- **WHEN** the `url`s of an edition's set are combined
+- **THEN** no `url` occurs more than once
+
+#### Scenario: A generic effect can't shadow an edition-specific one
+- **WHEN** an effect without `edition` has the same `url` as an effect with `edition: "5e"`
+- **THEN** the SRD data validation fails and names the `url`
+
+#### Scenario: No definition uses key
+- **WHEN** the fetched SRD effects and conditions are read in the app
+- **THEN** no definition has a `key`, `_id` or `is_condition` property, and no condition has `edition`
+
+#### Scenario: Definitions validate against the effects schema
+- **WHEN** every SRD effect and condition the API serves is validated against the effects schema
+- **THEN** all entries pass with no errors and none contains a duration field, an origin field or a sub-effect with `scaling`
+
+#### Scenario: No local lists
+- **WHEN** the app's source is searched for SRD effect or condition lists
+- **THEN** there are none: `src/data/effects.js`, `src/data/5e/conditions.js` and `src/data/5.5e/conditions.js` don't exist
+
+### Requirement: Concentration save on damage uses a structured, capped DC in 5.5e
+
+The 5.5e Concentration definition SHALL express the saving throw made when the holder
+takes damage as a structured save on a `damage_taken`-triggered sub-effect: a
+Constitution save with DC equal to half the damage taken (rounded down) or 10,
+whichever is higher, to a maximum of 30. A failed save ends Concentration. The
+sub-effect SHALL keep a human-readable description stating the same rule.
+
+#### Scenario: Small hit uses the DC 10 floor
+- **WHEN** a 5.5e holder of Concentration takes 13 damage
+- **THEN** the definition yields a Constitution save with DC 10
+
+#### Scenario: Large hit uses half the damage
+- **WHEN** a 5.5e holder of Concentration takes 45 damage
+- **THEN** the definition yields a Constitution save with DC 22
+
+#### Scenario: DC is capped at 30
+- **WHEN** a 5.5e holder of Concentration takes 80 damage
+- **THEN** the definition yields a Constitution save with DC 30, not 40
+
+### Requirement: Concentration save on damage in 5e has no DC cap
+
+The 5e Concentration definition SHALL express the same structured Constitution save on
+`damage_taken` (DC 10 or half the damage taken, rounded down, whichever is higher)
+without a maximum, matching the 2014 rules.
+
+#### Scenario: 2014 DC is not capped
+- **WHEN** a 5e holder of Concentration takes 80 damage
+- **THEN** the definition yields a Constitution save with DC 40
+
+### Requirement: Concentration ends when the holder is Incapacitated
+
+The Concentration definition in both editions SHALL declare a definition-level end
+condition that is true when the holder has the `incapacitated` condition. This check SHALL
+be answered from the holder's effect instances: an instance of the SRD `incapacitated`
+condition, or an effect that includes it.
+
+#### Scenario: Holder becomes Incapacitated
+- **WHEN** the holder of Concentration has an instance of the SRD `incapacitated` condition
+- **THEN** the definition's end condition evaluates true, meaning Concentration ends
+
+#### Scenario: Holder has a condition that includes Incapacitated
+- **WHEN** the holder of Concentration has an instance of Paralyzed, which includes Incapacitated
+- **THEN** the definition's end condition evaluates true
+
+#### Scenario: Holder is not Incapacitated
+- **WHEN** the holder of Concentration has no `incapacitated` instance and no effect that includes it (other conditions such as `prone` may be present)
+- **THEN** the definition's end condition evaluates false
+
+### Requirement: Concentration ends at 0 HP
+
+The Concentration definition in both editions SHALL keep an `on_zero_hp`-triggered
+sub-effect stating that Concentration is broken, so dropping to 0 HP ends it even when
+the Unconscious/Incapacitated condition has not been set on the entity.
+
+#### Scenario: Holder drops to 0 HP
+- **WHEN** the holder of Concentration reaches 0 HP
+- **THEN** the definition contains an `on_zero_hp` sub-effect that breaks Concentration
+
+### Requirement: Concentration description matches the edition's rules text
+
+Each edition's Concentration `description` SHALL summarise that edition's rules: ends
+on casting another Concentration spell, failing the damage save, being Incapacitated,
+or dying; the 5.5e text SHALL state the DC maximum of 30.
+
+#### Scenario: 5.5e description mentions the cap
+- **WHEN** the 5.5e Concentration definition is displayed
+- **THEN** its description states the save DC maximum of 30 and that Incapacitated ends Concentration
+
+### Requirement: Each edition ships exactly the SRD conditions
+
+Each edition's condition list (the entries the API marks `is_condition`) SHALL contain
+exactly these 15 conditions, one entry each, with `url` equal to the HK API condition `url`:
+`blinded`, `charmed`, `deafened`, `exhaustion`, `frightened`, `grappled`, `incapacitated`,
+`invisible`, `paralyzed`, `petrified`, `poisoned`, `prone`, `restrained`, `stunned`,
+`unconscious`.
+
+Every entry SHALL have a display `name` and a `description` that summarises that edition's
+rules text. Being in the condition list is what makes a definition a condition; entries have
+no `category`. Entries that are not SRD conditions of that edition SHALL NOT be present, such
+as `Dying` or `Surprised` in 5.5e, or per-level `Exhaustion N` entries.
+
+The app SHALL also keep these 15 `url`s as a fixed list. It uses that list to recognise a
+condition (for its icon and for condition-only lists) when the API's data isn't there.
+
+#### Scenario: Condition set matches the SRD
+- **WHEN** the `url`s of the 5e condition list and of the 5.5e condition list are read
+- **THEN** each is exactly the 15 `url`s above
+
+#### Scenario: Non-SRD 5.5e entries are gone
+- **WHEN** the 5.5e condition list is searched for `Dying` or `Surprised`
+- **THEN** no entry matches
+
+#### Scenario: url matches the icon and API naming
+- **WHEN** a condition with `url` `u` is displayed with its icon
+- **THEN** the icon class is `hki-u` and `u` equals the HK API condition `url` for that condition
+
+#### Scenario: Recognised without the API
+- **WHEN** the API couldn't be reached and an entity has an instance `{ source: "srd", source_key: "prone" }`
+- **THEN** it's still shown as a condition with the Prone icon, by its stored name
+
+### Requirement: Exhaustion is a single leveled condition
+
+In both editions Exhaustion SHALL be one definition with `url` `exhaustion` that stacks by
+level: applying it to a holder that already has it raises the level instead of adding a
+second instance. The level SHALL start at 1, SHALL NOT exceed 6, SHALL drop by 1 when the
+holder finishes a Long Rest, and the condition SHALL end when the level reaches 0. At
+level 6 the holder dies.
+
+#### Scenario: Re-applying raises the level
+- **WHEN** the Exhaustion definition's stacking and level settings are read
+- **THEN** stacking is by level, the initial level is 1 and the maximum is 6
+
+#### Scenario: Long Rest removes a level
+- **WHEN** the Exhaustion definition's level settings are read
+- **THEN** a Long Rest changes the level by −1 and the condition is removed at level 0
+
+#### Scenario: Level 6 is death
+- **WHEN** the Exhaustion sub-effects active at level 6 are collected, in either edition
+- **THEN** they include a death outcome, and no death outcome is active at levels 1–5
+
+### Requirement: 5e Exhaustion applies the 2014 cumulative rows
+
+The 5e Exhaustion definition SHALL express the 2014 table as sub-effects that become
+active from a given level and stay active at higher levels: level 1 Disadvantage on
+ability checks; level 2 Speed halved; level 3 Disadvantage on attack rolls and saving
+throws; level 4 Hit Point maximum halved; level 5 Speed 0; level 6 death.
+
+#### Scenario: Level 3 is cumulative
+- **WHEN** the 5e Exhaustion sub-effects active at level 3 are collected
+- **THEN** they are Disadvantage on ability checks, Speed halved, and Disadvantage on attack rolls and saving throws, and nothing else
+
+### Requirement: 5.5e Exhaustion scales with level
+
+The 5.5e Exhaustion definition SHALL express the 2024 rule as formulas on the instance's
+level: each D20 Test gets a `bonus` with `value: { formula: "-2 * level" }` and Speed gets
+a `bonus` with `value: { formula: "-5 * level" }`. It SHALL NOT impose Disadvantage on any
+roll.
+
+#### Scenario: Level 3 penalties
+- **WHEN** the 5.5e Exhaustion sub-effects are evaluated at level 3
+- **THEN** D20 Tests get −6, Speed gets −15 ft, and no sub-effect is Disadvantage
+
+### Requirement: Conditions that include Incapacitated reference it
+
+In both editions, Paralyzed, Petrified, Stunned and Unconscious SHALL reference the
+Incapacitated condition by its `url` (an `includes` sub-effect) instead of restating
+Incapacitated's rules, so their holders have exactly the mechanics of that edition's
+Incapacitated for as long as the including condition lasts. Unconscious SHALL also leave
+the holder Prone, and that Prone SHALL remain after Unconscious ends. Every condition
+reference SHALL resolve to a definition `url` in the same edition, and following
+references SHALL never lead back to the starting condition.
+
+#### Scenario: Paralyzed carries Incapacitated
+- **WHEN** the 5.5e Paralyzed definition is resolved with its references
+- **THEN** the result contains the 5.5e Incapacitated mechanics (no actions, Bonus Actions, Reactions or speech; Concentration broken; Disadvantage on Initiative) without Paralyzed listing them itself
+
+#### Scenario: A fix to Incapacitated propagates
+- **WHEN** the Incapacitated definition of an edition changes
+- **THEN** Paralyzed, Petrified, Stunned and Unconscious of that edition resolve to the changed mechanics with no edit of their own
+
+#### Scenario: Unconscious leaves the holder Prone
+- **WHEN** the Unconscious definition of either edition is read
+- **THEN** it includes Incapacitated and applies Prone as a separate condition when Unconscious is applied, so Prone is not removed when Unconscious ends
+
+#### Scenario: References resolve and don't cycle
+- **WHEN** every condition reference in an edition's lists is followed
+- **THEN** each resolves to a `url` in the same edition and no chain returns to its start
+
+### Requirement: 5.5e conditions follow the SRD 5.2.1 rules
+
+The 5.5e condition definitions SHALL encode the 2024 rules where they differ from 2014:
+
+- Incapacitated: no actions, Bonus Actions or Reactions; can't speak; Concentration is
+  broken; Disadvantage on Initiative.
+- Invisible: Advantage on Initiative; Concealed (not affected by effects that require
+  seeing it, unless the effect's creator can see it); attack rolls against it have
+  Disadvantage and its attack rolls have Advantage, except against a creature that can see
+  it.
+- Grappled: Speed 0 and can't increase; Disadvantage on attack rolls against any target
+  other than the grappler; ends when the grappler is Incapacitated.
+- Stunned: Incapacitated, automatically fails Strength and Dexterity saves, attack rolls
+  against it have Advantage — nothing about movement or speech beyond Incapacitated.
+
+#### Scenario: Incapacitated breaks Concentration in 5.5e
+- **WHEN** the 5.5e Incapacitated definition is read
+- **THEN** it states Concentration is broken and has no text saying otherwise
+
+#### Scenario: Grappled spares the grappler
+- **WHEN** the 5.5e Grappled holder attacks the grappler
+- **THEN** the Grappled Disadvantage on attack rolls does not apply, and it does apply when the holder attacks anyone else
+
+#### Scenario: Invisible helps Initiative
+- **WHEN** the 5.5e Invisible definition is read
+- **THEN** it grants Advantage on Initiative
+
+#### Scenario: 2024 Stunned has no extra movement rule
+- **WHEN** the 5.5e Stunned definition is read
+- **THEN** it has no Speed or speech sub-effect of its own and its description does not say "can't move" or "speak falteringly"
+
+### Requirement: Grappled ends when the grappler is Incapacitated
+
+In both editions the Grappled definition SHALL declare a definition-level end condition
+that is true when the entity that applied the grapple has the `incapacitated` condition.
+
+#### Scenario: Grappler becomes Incapacitated
+- **WHEN** the entity that applied Grappled has the `incapacitated` condition
+- **THEN** the Grappled definition's end condition evaluates true
+
+### Requirement: SRD data can be validated with one command
+
+The repository SHALL provide a command that checks the SRD effects and conditions against the
+effects schema and the cross-list rules in this spec, per edition set:
+- unique `url`s
+- no `key` or duration fields
+- `edition` only on effects, and only `"5e"` or `"5.5e"` (the API's `"generic"` read as
+  none)
+- every reference resolves in each edition set that contains the referencing entry
+- no reference cycles
+- exactly the 15 SRD conditions per edition
+
+The data SHALL be read from the HK API by default. JSON files can be given instead, so the
+API's data can be checked before it is published. The command SHALL exit non-zero with a
+readable list of problems when any check fails, and also when the API can't be reached.
+
+#### Scenario: Clean data passes
+- **WHEN** the validation command is run against the API
+- **THEN** it reports no problems and exits with code 0
+
+#### Scenario: A broken reference fails
+- **WHEN** a condition references a `url` that doesn't exist in its edition and the command is run
+- **THEN** it names the edition, entry and missing `url` and exits non-zero
+
+#### Scenario: A generic effect references an edition-only url
+- **WHEN** an effect without `edition` references a `url` that only exists with `edition: "5.5e"`
+- **THEN** the command reports the missing `url` for the 5e set and exits non-zero
+
+#### Scenario: Data from files
+- **WHEN** the command is given JSON files of the editions' lists instead of the API
+- **THEN** it checks those lists
+
+#### Scenario: API unreachable
+- **WHEN** the API can't be reached and no files are given
+- **THEN** the command says so and exits non-zero
+
+### Requirement: 5.5e ships the Burning hazard
+
+The SRD effect list SHALL contain a definition with `url: "burning"`, `name: "Burning"` and
+`edition: "5.5e"`, following the SRD 5.2.1 Rules Glossary. It SHALL have one `damage`
+sub-effect with `trigger: "start_turn_target"` and `roll: { dice_count: 1, dice_type: 4,
+damage_type: "fire" }`. Its description SHALL say that the creature takes 1d4 Fire damage at
+the start of each of its turns, and that it can end the effect with an action by giving
+itself the Prone condition. The 5e set SHALL NOT contain `burning`, because SRD 5.1 has no
+such hazard.
+
+#### Scenario: Burning resolves in 5.5e
+- **WHEN** an instance with `source: "srd"` and `source_key: "burning"` is resolved for a `"5.5e"` campaign
+- **THEN** the definition is found in the 5.5e set, with one start-of-turn 1d4 fire damage sub-effect
+
+#### Scenario: Burning is not in 5e
+- **WHEN** the 5e set is read
+- **THEN** it contains no definition with `url: "burning"`
+
+#### Scenario: Burning validates
+- **WHEN** the SRD data validation command is run
+- **THEN** Burning passes with no errors
+
+### Requirement: Charmed's attack restriction is against the charmer
+
+In both editions, Charmed's `restrict` sub-effect on `attack` SHALL have the condition
+`{ subject: "counterpart", type: "is_caster" }` (described as "Against the charmer"), so it
+restricts only attacks on the instance's caster, the charmer. Applied without a caster, the
+condition can't be checked, and the restriction is a possible one.
+
+#### Scenario: Both editions
+- **WHEN** the 5e and 5.5e Charmed definitions are read
+- **THEN** their attack restriction has the `is_caster` condition on the counterpart, and the SRD data validation passes
+
+### Requirement: SRD effects for damage modifiers, rerolls and roll floors
+
+The SRD effect list SHALL contain these definitions for each edition, following that
+edition's SRD text (5.1 for 5e, 5.2.1 for 5.5e), with `edition` set:
+- **Death Ward** (`death-ward`): a `damage_modifier` `floor_at_1` with `consume`
+  (`scope: "effect"`)
+- **Uncanny Dodge** (`uncanny-dodge`): a `damage_modifier` `halve_damage` on attack damage,
+  with the condition that the holder can see the attacker
+- **Evasion** (`evasion`): a `damage_modifier` `evasion` on Dexterity saves. In 5.5e it
+  doesn't apply while the holder is Incapacitated.
+- **Reliable Talent** (`reliable-talent`): a `roll_floor` of 10 on the die for skill
+  checks, with the proficiency requirement in its description
+- **Lucky** (5e) / **Luck** (5.5e) (`luck`): a `reroll` on a natural 1 for attack rolls,
+  ability checks and saving throws (5.5e: D20 Tests), keeping the new roll
+- **Undead Fortitude** (`undead-fortitude`): a `damage_modifier` `floor_at_1` with
+  `except_damage_types: ["radiant"]` and a Constitution save, DC `5 + damage_taken`. The
+  description names the critical hit exception.
+
+Acid Absorption is not one of them: the generic basic effect Absorption (`absorption`, no
+`edition`) replaces it, and `acid-absorption` SHALL NOT be a definition in the list.
+
+#### Scenario: Both editions
+- **WHEN** the 5e and 5.5e sets are read
+- **THEN** each contains these definitions with its own `edition`, and the SRD data validation passes
+
+#### Scenario: Death Ward ends when used
+- **WHEN** Death Ward's damage modifier is read
+- **THEN** it is a `floor_at_1` with `consume` and `scope: "effect"`
+
+#### Scenario: Acid Absorption is gone
+- **WHEN** the SRD effect list is searched for `url: "acid-absorption"`
+- **THEN** no entry matches, and `absorption` is present without `edition`
+
+### Requirement: Effects identical in both editions have no edition
+
+An SRD effect whose mechanics and description are the same under both editions' rules SHALL
+be one entry without `edition`, not two copies. Reaction Used SHALL be such an entry. An
+effect whose description quotes or summarises one edition's rules text SHALL keep one entry
+per edition, each with `edition`.
+
+#### Scenario: Reaction Used is shared
+- **WHEN** the SRD effect list is searched for `url: "reaction-used"`
+- **THEN** exactly one entry matches and it has no `edition`
+
+#### Scenario: Haste stays per edition
+- **WHEN** the SRD effect list is searched for `url: "haste"`
+- **THEN** two entries match, one with `edition: "5e"` and one with `edition: "5.5e"`
+
+### Requirement: Plain bonuses are basic effects, not items or spells
+
+An item or spell whose mechanics are one plain bonus, minimum or set value SHALL NOT be an SRD
+effect of its own: it is a basic effect with the number (and ability) fixed where it's
+linked. The SRD effect list SHALL NOT contain Gauntlets of Ogre Power, Ioun Stone (Strength),
+Robe of the Archmagi, Aid, Barkskin, Fly, Longstrider or Shield of Faith. Their `url`s no
+longer resolve: stored instances of them are unresolved references.
+
+#### Scenario: Items aren't listed
+- **WHEN** the SRD effects of either edition are listed
+- **THEN** none of the eight effects above is listed, and Ability Score Bonus, Ability Score Minimum, Armor Class Minimum and Fly Speed are
+
+#### Scenario: A stored removed effect
+- **WHEN** an encounter loads an instance with `source_key: "shield-of-faith"`
+- **THEN** it doesn't resolve and is handled as an unresolved reference: its name shows and it has no mechanics
+
+### Requirement: SRD ships Surprised per edition
+
+The SRD effect list SHALL contain Surprised (`surprised`) once per edition, each with
+`edition` set. It is an effect, not a condition: the condition lists SHALL NOT contain it.
+- **5e**: the holder can't move, take an action or take a reaction (a `restrict`), and a
+  `start_turn_target` sub-effect tells the DM at the start of its turn that it is surprised.
+  It is meant to be applied until the end of the holder's next turn.
+- **5.5e**: Disadvantage on the Initiative roll, and nothing else.
+
+#### Scenario: 5e Surprised at the start of its turn
+- **WHEN** a creature in a `"5e"` campaign has Surprised and its turn starts
+- **THEN** a notification says it is surprised, and its movement, actions and reactions are restricted
+
+#### Scenario: 5.5e Surprised
+- **WHEN** a creature in a `"5.5e"` campaign with Surprised rolls Initiative
+- **THEN** the roll has Disadvantage, and the effect restricts nothing
+
+### Requirement: SRD ships Hex, Hunter's Mark, Warding Bond and Rage
+
+The SRD effect list SHALL contain Hex (`hex`), Hunter's Mark (`hunters-mark`), Warding Bond
+(`warding-bond`) and Rage (`rage`), one entry per edition whose SRD contains it, each with
+`edition` set and following that edition's text:
+- **Hex**: extra 1d6 necrotic damage when the caster hits the holder, and Disadvantage on
+  ability checks with a chosen ability (`choice: "ability"`).
+- **Hunter's Mark**: extra 1d6 force (5.5e) or weapon (5e) damage when the caster hits the
+  holder with an attack.
+- **Warding Bond**: +1 to AC and saving throws, resistance to all damage, and the damage the
+  holder takes is also dealt to the caster.
+- **Rage**: resistance to bludgeoning, piercing and slashing damage; a damage bonus on
+  Strength attacks whose amount is a value choice (the Rage Damage of the barbarian's
+  level); Advantage on Strength checks and saves; no spellcasting or Concentration; ends when
+  the holder is Incapacitated (5.5e) or Unconscious (5e).
+
+#### Scenario: Hex asks for the ability
+- **WHEN** a DM in a campaign whose edition has Hex applies it and picks Wisdom
+- **THEN** the holder has Disadvantage on Wisdom checks, and the caster's hits on it deal an extra 1d6 necrotic damage
+
+#### Scenario: Rage damage is a choice
+- **WHEN** the DM applies Rage and enters 2
+- **THEN** the holder's Strength attacks deal 2 extra damage
+
+#### Scenario: Only where the SRD has it
+- **WHEN** an edition's SRD does not contain one of these effects
+- **THEN** that edition's set contains no entry with its `url`
+
+### Requirement: The condition compendium reads the v2 conditions
+
+The compendium's conditions (the list, a condition's page, the campaign resources
+compendium) and the condition selects (`hk-condition-select`, the NPC form's condition
+immunities) SHALL read the HK API's `/v2/conditions/{edition}`, `"5e"` or `"5.5e"`. The app
+SHALL NOT read the old `/conditions` endpoints.
+
+A condition SHALL be shown with its `description`, each of its sub-effects described in a
+line as in the Effects drawer, and for Exhaustion the edition's level table. Its icon SHALL be
+`hki-<url>`. A condition page's meta description SHALL be taken from its `description`.
+
+#### Scenario: Compendium list
+- **WHEN** the 5.5e conditions compendium is opened and "blin" is searched
+- **THEN** Blinded is listed, from `/v2/conditions/5.5e`
+
+#### Scenario: Condition page
+- **WHEN** the page of the 5e condition Blinded is opened
+- **THEN** it shows the 5e description, a line per sub-effect (Disadvantage on attack rolls) and the Blinded icon
+
+#### Scenario: Exhaustion
+- **WHEN** the page of Exhaustion is opened for an edition
+- **THEN** it also shows that edition's level table
+
+#### Scenario: Unknown condition
+- **WHEN** a condition page is opened for a url that doesn't exist
+- **THEN** it says the condition couldn't be found
+
+#### Scenario: Condition select
+- **WHEN** the NPC form's condition immunities are opened for a 5.5e NPC
+- **THEN** the 15 conditions of `/v2/conditions/5.5e` are offered, each with its icon

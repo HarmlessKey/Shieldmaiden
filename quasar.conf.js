@@ -27,6 +27,7 @@ module.exports = function (/* ctx */) {
 			{ path: "firebase-auth", server: false },
 			{ path: "vue-shortkey", server: false },
 			{ path: "vue-snotify", server: false },
+			{ path: "api-effects", server: false },
 		],
 
 		// https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -86,6 +87,14 @@ module.exports = function (/* ctx */) {
 			// "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
 			chainWebpack(chain) {
 				chain.plugin("eslint-webpack-plugin").use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
+
+				// Markdown files (documentation pages) are imported as strings
+				chain.module
+					.rule("markdown")
+					.test(/\.md$/)
+					.use("raw-loader")
+					.loader("raw-loader")
+					.options({ esModule: false });
 			},
 		},
 

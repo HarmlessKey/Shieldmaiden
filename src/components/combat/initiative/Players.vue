@@ -4,7 +4,7 @@
 			<li v-for="(entity, index) in players" :key="entity.key">
 				<BasicEntity :entity="entity" :size="48" :padding="8">
 					<div class="hit-points">
-						{{ entity.curHp }} / {{ entity.maxHp }}
+						{{ entity.curHp }} / {{ effectiveMaxHp(entity) }}
 						<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
 					</div>
 					<button
@@ -69,6 +69,12 @@ export default {
 	methods: {
 		...mapActions(["setDrawer", "set_initiative"]),
 		...mapActions("tutorial", ["completeStep"]),
+		/**
+		 * Maximum hit points with manual bonuses and effects
+		 */
+		effectiveMaxHp(entity) {
+			return this.$store.getters.effective_entity(entity.key)?.maxHp ?? entity.maxHp;
+		},
 		setInitiative(key, initiative) {
 			this.set_initiative({ key, initiative });
 

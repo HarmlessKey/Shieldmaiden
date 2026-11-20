@@ -129,23 +129,7 @@ import { mapActions, mapGetters } from "vuex";
 import { cleanEffectDefinition, schemaErrorMessages } from "src/utils/effectFunctions";
 import { NotEnoughSlotsError, NOT_ENOUGH_SLOTS_MESSAGE } from "src/utils/errors";
 import CopyContent from "src/components/CopyContent";
-
-let validateEffect;
-
-/**
- * Schema validator for effect definitions, loaded on first use so Ajv and the schema
- * stay out of the main bundle
- */
-async function getEffectValidator() {
-	if (!validateEffect) {
-		const [{ default: Ajv }, { default: schema }] = await Promise.all([
-			import("ajv"),
-			import("src/schemas/hk-effects-schema.json"),
-		]);
-		validateEffect = new Ajv({ allErrors: true, strict: false }).compile(schema);
-	}
-	return validateEffect;
-}
+import { getEffectValidator } from "src/utils/effectValidator";
 
 export default {
 	name: "EditEffect",

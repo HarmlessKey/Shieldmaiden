@@ -184,8 +184,10 @@
 
 					<!-- DAMAGE / HEALING ROLLS -->
 					<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
+						<!-- A damage penalty has no line of its own: it's shown on the damage it lowers -->
+						<template v-for="(rolled, rolled_index) in action.rolls">
 						<q-expansion-item
-							v-for="(rolled, rolled_index) in action.rolls"
+							v-if="!penaltyPart(action_index, rolled_index)"
 							:key="`rolled-${rolled_index}`"
 							:dark="$store.getters.theme === 'dark'"
 							switch-toggle-side
@@ -332,7 +334,16 @@
 								<hr />
 								<div>
 									<b>Final result</b><br />
-									(<hk-animated-integer :value="rolled.rollResult.total" />)
+									(<hk-animated-integer :value="rolled.rollResult.total" /><template
+										v-if="damagePart(action_index, rolled_index)"
+										><span
+											v-for="(penalty, penalty_index) in damagePart(action_index, rolled_index).penalties"
+											:key="`penalty-${penalty_index}`"
+										>
+											− {{ penalty.amount }}<template v-if="penalty.name"> {{ penalty.name }}</template
+										><template v-if="penaltyNote(penalty)"> ({{ penaltyNote(penalty) }})</template></span
+										></template
+									>)
 									<span
 										v-if="
 											savingThrowResult[action_index] === 'save' ||
@@ -389,6 +400,7 @@
 								</div>
 							</div>
 						</q-expansion-item>
+						</template>
 					</q-list>
 
 					<!-- EFFECTS LINKED TO THE ACTION: whether they apply with the chosen result, and
@@ -1346,6 +1358,11 @@ export default {
 				action.rolls.forEach((rolled, rolled_index) => {
 					parts.push({
 						key: `${action_index}:${rolled_index}`,
+						group: action_index,
+						name: rolled.name,
+						dice: rolled.rollResult.throws?.length
+							? String(rolled.rollResult.roll).replace(/^[−-]\s*/, "").trim()
+							: undefined,
 						damageType: rolled.damage_type,
 						magical: rolled.magical,
 						amount: parseInt(rolled.rollResult.total) || 0,
@@ -1395,6 +1412,21 @@ export default {
 		damagePart(action_index, rolled_index) {
 			if (this.roll.actions[action_index]?.type === "healing") return undefined;
 			return this.damageResult().parts.find(({ key }) => key === `${action_index}:${rolled_index}`);
+		},
+		/**
+		 * The damage part of a penalty roll (subtracted from the damage of its type), if it is one
+		 */
+		penaltyPart(action_index, rolled_index) {
+			const part = this.damagePart(action_index, rolled_index);
+			return part?.subtracted !== undefined ? part : undefined;
+		},
+		/**
+		 * What a penalty on a damage line rolled: its dice and total, and whether it was limited
+		 * to the damage of its type, e.g. "1d4: 4, limited"
+		 */
+		penaltyNote({ dice, rolled, limited }) {
+			const roll = dice ? `${dice}: ${rolled}` : limited ? `${rolled}` : "";
+			return [roll, limited ? "limited" : ""].filter(Boolean).join(", ");
 		},
 		totalRollValue(action, action_index, roll) {
 			// Damage: after the target's damage modifiers and defenses

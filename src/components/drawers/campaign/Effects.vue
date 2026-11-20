@@ -57,12 +57,13 @@ import { mapActions } from "vuex";
 import EffectList from "src/components/drawers/encounter/effects/EffectList.vue";
 import PlayerEffects from "src/components/campaign/PlayerEffects.vue";
 import {
+	customEffectsEnabled,
 	getSrdDefinitions,
 	isSrdCondition,
 	matchesName,
 	withCustomComingSoon,
 } from "src/utils/effectFunctions";
-import { custom_effects_released, default_edition } from "src/utils/generalConstants";
+import { default_edition } from "src/utils/generalConstants";
 import { showNotices } from "src/utils/generalFunctions";
 import { applyCampaignEffectMixin } from "src/mixins/applyCampaignEffect.js";
 
@@ -118,7 +119,8 @@ export default {
 			return withCustomComingSoon(
 				this.groups
 					.map((group) => ({ ...group, entries: group.entries.filter(({ name }) => matchesName(name, this.search)) }))
-					.filter((group) => group.entries.length)
+					.filter((group) => group.entries.length),
+				customEffectsEnabled(this.$store.getters.userInfo)
 			);
 		},
 		// Names of the campaign's players by id
@@ -178,7 +180,7 @@ export default {
 		},
 	},
 	async mounted() {
-		if (this.$store.getters.user && custom_effects_released) {
+		if (this.$store.getters.user && customEffectsEnabled(this.$store.getters.userInfo)) {
 			this.customEffects = (await this.get_effects()) ? this.$store.getters["effects/effects"] : [];
 		}
 	},

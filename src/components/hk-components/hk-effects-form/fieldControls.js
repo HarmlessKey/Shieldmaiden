@@ -18,7 +18,7 @@ import {
 } from "src/utils/effectsConstants";
 import { startCase } from "lodash";
 import { abilities, creature_types, damage_types, skills } from "src/utils/generalConstants";
-import { choiceKinds, getSrdDefinitions } from "src/utils/effectFunctions";
+import { STAT_SUB_TYPES, choiceKinds, getSrdDefinitions } from "src/utils/effectFunctions";
 
 const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
@@ -289,18 +289,24 @@ const MULTIPLIED = [
 ];
 
 const hasSubType = (sub_effect, list) => (sub_effect.sub_types || []).some((sub_type) => list.includes(sub_type));
+// A roll with dice, on a value rolled once when the effect is applied (Strength Drain −1d4)
+const hasDice = (sub_effect) => !!(sub_effect.roll?.dice_count && sub_effect.roll?.dice_type);
 // For these types, the test decides; other types always show the field
 const forTypes = (types, test) => (sub_effect) => !types.includes(sub_effect.type) || test(sub_effect);
 const allOf = (...tests) => (sub_effect) => tests.every((test) => test(sub_effect));
 
 const RULES = {
-	// Dice on a roll (Bless), temporary hit points (False Life), extra critical dice
+	// Dice on a roll (Bless), temporary hit points (False Life), a value rolled when applied
+	// (Strength Drain), extra critical dice
 	roll: allOf(
-		forTypes(VALUE_TYPES, (s) => hasSubType(s, [...ROLLS, "temp_hp"])),
+		forTypes(VALUE_TYPES, (s) => hasSubType(s, [...ROLLS, "temp_hp", ...STAT_SUB_TYPES])),
 		forTypes(["critical"], (s) => hasSubType(s, ["extra_crit_dice"]))
 	),
-	// Speed halved, or a negative multiplier for a penalty on rolls (Bane)
-	multiplier: forTypes(VALUE_TYPES, (s) => hasSubType(s, [...MULTIPLIED, ...ROLLS])),
+	// Speed halved, or a negative multiplier for a penalty on rolls (Bane) and rolled values
+	multiplier: forTypes(
+		VALUE_TYPES,
+		(s) => hasSubType(s, [...MULTIPLIED, ...ROLLS]) || (hasDice(s) && hasSubType(s, STAT_SUB_TYPES))
+	),
 	perspective: forTypes(VALUE_TYPES, (s) => hasSubType(s, ROLLS)),
 	context: forTypes(VALUE_TYPES, (s) => hasSubType(s, ROLLS)),
 	creature_types: forTypes(VALUE_TYPES, (s) => hasSubType(s, ROLLS)),

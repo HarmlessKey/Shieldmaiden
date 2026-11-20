@@ -485,7 +485,13 @@
 				"applied_turn_key": { "type": "string", "description": "Entity whose turn it was when applied, for the same-turn rule of next_turn durations. Falls back to caster_key." },
 				"temp_hp_granted": { "type": "integer", "minimum": 0, "description": "Temporary hit points granted by an expires_with_effect sub-effect, lost when the instance ends." },
 				"parent_id": { "type": "string", "description": "Instance this one depends on (Crawler Mucus: Paralyzed while Poisoned; Crocodile: Restrained while Grappled). Removing the parent removes this one." },
-				"immune_until_round": { "type": "integer", "description": "Temporary immunity to this effect from this caster after a successful save." }
+				"immune_until_round": { "type": "integer", "description": "Temporary immunity to this effect from this caster after a successful save." },
+				"rolled_values": {
+					"type": "object",
+					"description": "Totals rolled when the instance was applied, for sub-effects whose value is a roll (Strength Drain 1d4), keyed by the sub-effect's id or sub_<index> in the definition's sub_effects. The total is before the sub-effect's multiplier.",
+					"propertyNames": { "pattern": "^[A-Za-z0-9_-]{1,100}$" },
+					"additionalProperties": { "type": "number" }
+				}
 			}
 		},
 
@@ -607,8 +613,8 @@
 					"description": "Numeric value, or a formula (Aura of Protection: { formula: 'caster.cha_mod', min: 1 }). A value that grows with the effect's own level uses the level variable (2024 Exhaustion: { formula: '-2 * level' }).",
 					"oneOf": [{ "type": "number" }, { "type": "string" }, { "$ref": "#/$defs/formula" }]
 				},
-				"roll": { "$ref": "#/$defs/dice_roll" },
-				"multiplier": { "type": "number", "description": "Applied after value/roll (0.5 halved, 2 doubled)." },
+				"roll": { "$ref": "#/$defs/dice_roll", "description": "Dice on a roll or damage (Bless, Divine Favor). On a value (bonus, base, fixed, floor or cap on AC, Speed, max_hp, ability_score…), rolled once when the effect is applied and stored in the instance's rolled_values." },
+				"multiplier": { "type": "number", "description": "Applied after value/roll (0.5 halved, 2 doubled). A negative multiplier makes a roll a penalty: −1d4 on rolls and damage (Bane), or a rolled value subtracted (Strength Drain)." },
 				"min_level": { "type": "integer", "description": "Only active at this instance level or higher (2014 Exhaustion rows)." },
 				"max_level": { "type": "integer" },
 				"choice": {

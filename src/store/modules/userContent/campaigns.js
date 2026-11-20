@@ -14,6 +14,8 @@ import {
 	effectiveStats,
 	effectLabel,
 	formulaVars,
+	rollEffectValues,
+	rolledValueNotices,
 	generateEffectKey,
 	healingReceivedCap,
 	healingResult,
@@ -842,7 +844,7 @@ const campaign_actions = {
 			return { key: existingKey, notices: levelNotices };
 		}
 
-		const instance = buildEffectInstance({
+		const built = buildEffectInstance({
 			definition: { ...definition, name: entry.name || definition.name },
 			source: entry.source,
 			sourceKey: entry.sourceKey,
@@ -852,6 +854,14 @@ const campaign_actions = {
 			casterName,
 			concentrationFor,
 		});
+		// Values rolled when applied (Strength Drain −1d4), as in the tracker's apply_effect
+		const rollEntities = context ? campaignEntities(players, context.basePlayers) : players;
+		const { rolled_values, rolls } = rollEffectValues({
+			definition,
+			instance: built,
+			vars: { self: formulaVars(rollEntities[playerId]), caster: formulaVars(rollEntities[casterKey]) },
+		});
+		const instance = rolls.length ? { ...built, rolled_values } : built;
 		const effectKey = generateEffectKey(Object.keys(effects));
 		await dispatch("set_campaign_entity_effect", {
 			campaignId,
@@ -860,7 +870,9 @@ const campaign_actions = {
 			effectKey,
 			value: instance,
 		});
-		if (!context) return { key: effectKey, notices: [] };
+		const effectName = (definition.name || instance.name || "").capitalize();
+		const rollNotices = rolledValueNotices(rolls, effectName, instance);
+		if (!context) return { key: effectKey, notices: rollNotices };
 
 		// As in the tracker's apply_effect: also_heal (Aid), within the maximum
 		const entities = campaignEntities(players, context.basePlayers);
@@ -873,7 +885,7 @@ const campaign_actions = {
 
 		// An immunity it just gained ends the conditions it covers (Heroism: Frightened)
 		const holderName = context.basePlayers?.[playerId]?.character_name;
-		const notices = [];
+		const notices = [...rollNotices];
 		const updated = campaignEntities(players, context.basePlayers)[playerId];
 		const { condition_immunities = [] } = effectiveDefenses({
 			entity: updated,

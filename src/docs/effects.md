@@ -292,10 +292,10 @@ changes: Armor Class, Speed, saving throws, Reactions… You can pick more than 
 a Bonus that applies to attack rolls and saving throws.
 
 The form only shows the fields that matter for the type and what it applies to. A Bonus on
-Armor Class only needs a Value. A Bonus on Speed also offers a Multiplier, and a Bonus on
-saving throws also offers a Roll and the roll filters (Whose rolls, Abilities, Context,
-Creature types). When you change the type or Applies to, fields that are no longer used are
-cleared.
+Armor Class offers a Value or a Roll (see [Rolled values](#rolled-values)). A Bonus on Speed
+also offers a Multiplier, and a Bonus on saving throws also offers the roll filters (Whose
+rolls, Abilities, Context, Creature types). When you change the type or Applies to, fields that
+are no longer used are cleared.
 
 | Type | What it does | Example |
 |---|---|---|
@@ -347,7 +347,41 @@ cleared.
   a multiplier multiplies the whole value: 2014 Exhaustion halves Speed with a multiplier of 0.5.
 
 Bonus dice are rolled together with the roll they change and shown by name ("Bless +1d4: 3").
-A negative fixed value or multiplier makes dice a penalty (Bane is −1d4).
+A negative fixed value or multiplier makes dice a penalty (Bane is −1d4). With dice, a negative
+fixed value only gives the dice their sign: 1d4 with a fixed value of −1 is −1d4, not 1d4 − 1.
+A positive fixed value is added to the dice. Use a multiplier of −1 to make a penalty clear.
+
+This works the same for damage bonuses on attacks. A Bonus on damage rolls with a Roll of 1d4
+and a Multiplier of −1 subtracts 1d4 from the hit, and a Value of −2 subtracts 2. A damage
+penalty lowers the damage of its damage type, or of the attack's first damage type when it has
+none. It's subtracted before resistance and other damage modifiers: 12 bludgeoning with a −2
+penalty against a creature resistant to bludgeoning deals (12 − 2) / 2 = 5. The roll dialog
+shows the penalty, with its dice, on the line of the damage it lowers. It
+never takes that type's damage below 0: a −4 on a hit with 2 slashing is limited to −2. A
+penalty of a type the hit doesn't deal, like −1d4 radiant on a slashing hit, isn't rolled at
+all.
+
+### Rolled values
+
+A Roll on a value (a Bonus, Set base value, Fixed value, Minimum value or Maximum value on
+Armor Class, Speed, Hit Point maximum, an ability score, Initiative and the like) is rolled
+**once, when the effect is applied**. The total is kept on the effect and used as its value for
+as long as the effect lasts. It isn't rolled again when the effect changes level or the
+encounter is opened again. Each creature the effect is applied to gets its own roll.
+
+Use a **Multiplier** of −1 to make it a penalty. A Shadow's Strength Drain is a Bonus on
+Ability score, Strength, with a Roll of 1d4 and a Multiplier of −1. When it's applied, you get
+a notice with the roll ("Strength Drain: 1d4 = 3, Strength −3"), and the changed value's tooltip
+shows the roll ("Strength Drain: −3 (1d4)"). A rolled Hit Point maximum bonus with **Also raise
+current hit points** heals by the rolled amount.
+
+- With **Choice → Value**, the chosen number is used and nothing is rolled.
+- Temporary hit points keep their own **Grant temp HP** prompt.
+- An effect that wasn't rolled when it was applied, like a trait effect, or an effect applied
+  before its Roll was added, doesn't change the value. Its tooltip says "not rolled". Remove
+  the effect and apply it again to roll.
+- Applying the same effect to a creature twice doesn't add up: the instance that changes the
+  value most counts.
 
 ### Whose rolls
 
@@ -586,7 +620,8 @@ tracker doesn't know the source of a roll, the sub-effect is shown as a reminder
 ### Id
 
 A name for this sub-effect that formulas and other sub-effects can use to refer to it.
-You'll rarely need it.
+You'll rarely need it. A [rolled value](#rolled-values) is kept under its id, so give it one if
+you might reorder the sub-effects of an effect that's already applied.
 
 ## Effect configuration
 
@@ -900,6 +935,10 @@ creature instead of being applied:
 
 **Bless**: Type Bonus, Applies to attack rolls and saving throws, Roll 1 × d4. Apply it with a
 Concentration duration.
+
+**Strength Drain**: Type Bonus, Applies to Ability score, Abilities Strength, Roll 1 × d4,
+Multiplier −1. Each time it's applied, 1d4 is rolled and the target's Strength goes down by
+the result until the effect is removed.
 
 **Absorption** (generic): Type Damage modifier, Applies to Absorb, configuration Choice →
 Damage type, no damage types listed. When applied, the DM picks the damage type.

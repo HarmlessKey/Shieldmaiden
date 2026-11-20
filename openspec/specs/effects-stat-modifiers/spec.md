@@ -94,7 +94,10 @@ A numeric sub-effect SHALL count only when:
 
 When the same definition (the same `source` and `source_key`) is on one entity more than
 once, its sub-effects SHALL count for one instance only: the one whose contributions change
-the value most.
+the value most. A definition with `stacking.mode: "independent"` is the exception: every
+instance of it SHALL count, each with its own choices, level and rolled values. This applies
+everywhere the tracker counts a definition once: effective values, d20 roll modifiers,
+damage bonuses, damage modifiers and restrictions.
 
 #### Scenario: Exhaustion rows by level
 - **WHEN** a player has 5e Exhaustion at level 1
@@ -107,6 +110,18 @@ the value most.
 #### Scenario: Different effects stack
 - **WHEN** an entity has two different custom effects, each with `bonus` `ac` 2
 - **THEN** its effective AC is 4 higher
+
+#### Scenario: Strength Drain twice
+- **WHEN** a fighter with Strength 16 is hit twice by a Shadow, and the two Strength Drain instances (`stacking.mode: "independent"`) rolled 3 and 2
+- **THEN** its effective Strength is 11, and the tooltip lists both reductions
+
+#### Scenario: Independent roll penalty
+- **WHEN** an entity has two instances of a custom effect with `stacking.mode: "independent"` and a −1d4 bonus on attack rolls
+- **THEN** its attack rolls subtract two separate d4s
+
+#### Scenario: Doesn't stack is unchanged
+- **WHEN** an entity has two Bless instances from different clerics (no `stacking`)
+- **THEN** its attack rolls add one d4
 
 ### Requirement: Effective values are shown and marked
 

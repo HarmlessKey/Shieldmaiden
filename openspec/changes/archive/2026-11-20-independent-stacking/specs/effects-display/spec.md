@@ -74,3 +74,31 @@ is removed and others remain, the detail view SHALL show the newest remaining co
 #### Scenario: Remove one copy
 - **WHEN** the DM removes one copy from the detail view
 - **THEN** only that instance is removed, the detail view shows the remaining copy, and the chip no longer shows a count
+
+### Requirement: Effects' extra values are shown as one value
+
+Where the tracker shows what effects add to a roll, it SHALL show one value for all of them,
+with each effect's part in a tooltip:
+- The attacker's to-hit and damage chips SHALL add the effects' bonuses up: dice of the same
+  size and sign are counted together and flat values summed, per damage type. Dice of
+  opposite signs (Bless and Bane) stay apart. Each effect's line stays in the tooltip.
+- In the roll dialog, the to-hit line SHALL show the effects' bonus dice as one signed total,
+  and a damage line SHALL show its penalties as one "− N". Their tooltips SHALL list each
+  effect once, with its dice counted together and every die rolled, e.g. "Weak Grip −2d4:
+  3, 1".
+
+#### Scenario: Two stacked attack penalties
+- **WHEN** an attacker has two independent "Shaky Aim" copies with −1d4 on attack rolls
+- **THEN** its to-hit chip reads "To hit −2d4", and its tooltip lists both copies
+
+#### Scenario: Bless and Bane
+- **WHEN** an attacker has Bless (+1d4) and Bane (−1d4)
+- **THEN** its to-hit chip reads "To hit +1d4 −1d4"
+
+#### Scenario: Roll dialog to-hit
+- **WHEN** an attack is rolled with Bless rolling 3 and two Shaky Aim copies rolling 4 and 1
+- **THEN** the to-hit line shows "− 2" after the modifier, and its tooltip reads "Bless +1d4: 3" and "Shaky Aim −2d4: 4, 1"
+
+#### Scenario: Roll dialog damage penalties
+- **WHEN** a hit of 20 slashing has two Weak Grip copies rolling 3 and 2
+- **THEN** the damage line reads "(20 − 5)", and its tooltip reads "Weak Grip −5 (2d4: 3 + 2)"

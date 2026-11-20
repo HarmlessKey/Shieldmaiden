@@ -8,10 +8,11 @@ The effects schema SHALL define an effect link with these fields, and no others:
 - `duration`: a duration as applied in the tracker (type, value and unit, anchor and edge,
   repeat save, escape, cancel triggers, ends when, effects when it ends)
 - `choices`: fixed choices by kind (`ability`, `damage_type`, `skill`, `condition`,
-  `creature_type`, `option`, `value`), each a string; a value choice is a number written as a
-  string. A `damage_type` choice MAY instead be a list of damage types, when the effect's
-  definition marks that choice as taking several (see "Definitions can mark choices optional or
-  multiple")
+  `creature_type`, `option`, `value`, `roll`); a value choice is a number written as a string,
+  a roll choice `{ dice_count, dice_type, fixed_val }` like a reminder's damage, every other
+  choice a string. A `damage_type` choice MAY instead be a list of damage types, when the
+  effect's definition marks that choice as taking several (see "Definitions can mark choices
+  optional or multiple")
 - `level`: the levels it applies, an integer of at least 1, for an effect with a level track
 - `magical`: a boolean
 - `scaling`: tiers that change the value choice and level with the slot or caster level, for
@@ -25,6 +26,10 @@ SHALL NOT carry `scaling` or `duration_scaling`.
 #### Scenario: A grapple link
 - **WHEN** a link is `{ effect: { source: "srd", source_key: "grappled", name: "Grappled" }, duration: { type: "cancelled", escape: { dc: 14 } } }`
 - **THEN** it validates against the effect link schema
+
+#### Scenario: A link with a fixed roll
+- **WHEN** a young gold dragon's Weakening Breath links Weakening Breath with `choices: { roll: { dice_count: 1, dice_type: 6 } }`
+- **THEN** it validates against the effect link schema, and the same link with `choices: { roll: "1d6" }` or `choices: { roll: { dice_count: 1 } }` does not
 
 #### Scenario: A link with a save is rejected
 - **WHEN** a link has `save: { ability: "constitution", dc: 13 }`

@@ -679,6 +679,7 @@ import {
 	linkApplication,
 	findSrdDefinition,
 	getRequiredChoices,
+	choiceFixed,
 	storedChoice,
 	validChoice,
 	getSrdDefinitions,
@@ -1028,7 +1029,7 @@ export default {
 			const definition = this.linkDefinition(linked.link);
 			if (!definition) return [];
 			const fixed = linked.link.choices || {};
-			return getRequiredChoices(definition).filter(({ kind }) => fixed[kind] === undefined);
+			return getRequiredChoices(definition).filter(({ kind }) => !choiceFixed(kind, fixed));
 		},
 		/**
 		 * What a checked linked effect still needs before the roll can be applied, in words

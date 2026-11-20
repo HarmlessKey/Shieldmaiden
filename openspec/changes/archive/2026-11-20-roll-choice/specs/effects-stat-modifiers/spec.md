@@ -15,7 +15,9 @@ SHALL be used everywhere the tracker uses a sub-effect's roll:
 - roll bonuses and damage bonuses roll it on every roll they add to
 
 Until a valid roll is chosen, the sub-effect SHALL do nothing. The resolved definition SHALL
-NOT be changed: each instance uses its own choice.
+NOT be changed: each instance uses its own choice. An instance or link without a roll but
+with a numeric `choices.value` SHALL use that value as a fixed roll, so instances and links
+made while an effect had a value choice keep working after it switches to a roll choice.
 
 #### Scenario: Damage over time
 - **WHEN** a creature has a custom "Burning" effect (`damage` triggered at the start of its turn, `roll: { damage_type: "fire" }`, `choice: "roll"`) applied with `choices: { roll: { dice_count: 2, dice_type: 6 } }`
@@ -32,6 +34,10 @@ NOT be changed: each instance uses its own choice.
 #### Scenario: Only a fixed value
 - **WHEN** the chosen roll is `{ fixed_val: 5 }` on a damage sub-effect
 - **THEN** it deals 5 damage without rolling
+
+#### Scenario: Made with a value choice
+- **WHEN** a creature has a Damage Over Time instance with `choices: { damage_type: "fire", value: "5" }`, and the definition now has `choice: ["damage_type", "roll"]`
+- **THEN** it still takes 5 fire damage at the start of its turns, and a link with `choices: { value: "4" }` on Hit Point Maximum Reduction doesn't ask for a roll
 
 #### Scenario: Two instances, two rolls
 - **WHEN** one creature has Burning with roll 1d4 and another with 3d6

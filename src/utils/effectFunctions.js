@@ -641,7 +641,7 @@ export function linkApplication(link = {}, { cast, definition } = {}) {
 	const openChoices = definition
 		? getRequiredChoices(definition)
 				.map(({ kind }) => kind)
-				.filter((kind) => choices[kind] === undefined)
+				.filter((kind) => !choiceFixed(kind, choices))
 		: [];
 
 	const application = { choices };
@@ -1300,7 +1300,9 @@ export function choiceKinds(sub_effect) {
  * @returns {boolean}
  */
 export function missingChoice(sub_effect, instance) {
-	return choiceKinds(sub_effect).some((kind) => instance?.choices?.[kind] === undefined);
+	return choiceKinds(sub_effect).some((kind) =>
+		kind === "roll" ? !rollChoiceOf(instance?.choices) : instance?.choices?.[kind] === undefined
+	);
 }
 
 // The sub-effect field each choice kind fills (option fills none)
@@ -1325,6 +1327,8 @@ const CHOICE_FIELDS = {
  */
 export function fixChoices(definition, choices = {}) {
 	const fixed = Object.keys(choices).filter((kind) => choices[kind] !== undefined);
+	// A link made while the effect had a value choice fixes its roll with the value
+	if (!fixed.includes("roll") && rollChoiceOf(choices)) fixed.push("roll");
 	const fix = (value) => {
 		if (Array.isArray(value)) return value.map(fix);
 		if (!value || typeof value !== "object") return value;
@@ -2443,6 +2447,35 @@ export function chosenRoll(choice) {
 }
 
 /**
+ * The roll of an instance's or link's choices: `roll`, or a numeric `value` as a fixed roll.
+ * The value is for effects that switched from a value choice to a roll choice (the generic
+ * Damage Over Time and Hit Point Maximum Reduction): instances and links made before still
+ * have `choices.value`.
+ *
+ * @param {object} choices
+ * @returns {object|undefined} chosenRoll
+ */
+export function rollChoiceOf(choices = {}) {
+	const roll = chosenRoll(choices?.roll);
+	if (roll) return roll;
+	const value = choices?.value;
+	if (value === undefined || value === null || value === "" || !Number.isFinite(Number(value))) return undefined;
+	return { fixed_val: Math.trunc(Number(value)) };
+}
+
+/**
+ * Whether choices (a link's, an instance's) settle a choice kind; a roll also by a value
+ * (rollChoiceOf)
+ *
+ * @param {string} kind
+ * @param {object} choices
+ * @returns {boolean}
+ */
+export function choiceFixed(kind, choices = {}) {
+	return kind === "roll" ? !!rollChoiceOf(choices) : choices?.[kind] !== undefined;
+}
+
+/**
  * A chosen roll in words: "2d6+1", "1d4", "5"
  *
  * @param {object} choice
@@ -2494,7 +2527,7 @@ export function rollNotation(sub_effect) {
  */
 export function withChosenRoll(sub_effect, instance) {
 	if (!choiceKinds(sub_effect).includes("roll")) return sub_effect;
-	const parsed = chosenRoll(instance?.choices?.roll);
+	const parsed = rollChoiceOf(instance?.choices);
 	const { value, roll, ...rest } = sub_effect; // eslint-disable-line no-unused-vars
 	// eslint-disable-next-line no-unused-vars
 	const { dice_count, dice_type, fixed_val, modifier, ...kept } = roll && typeof roll === "object" ? roll : {};

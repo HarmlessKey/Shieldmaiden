@@ -566,7 +566,7 @@
 		"group": "actions",
 		"name": "Rotting Fist",
 		"desc": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) bludgeoning damage plus 10 (3d6) necrotic damage. If the target is a creature, it must succeed on a DC 12 Constitution saving throw or be cursed with mummy rot. The cursed target can't regain hit points, and its hit point maximum decreases by 10 (3d6) for every 24 hours that elapse. If the curse reduces the target's hit point maximum to 0, the target dies, and its body turns to dust. The curse lasts until removed by the remove curse spell or other magic.",
-		"tests": ["catalogue effect from a phrase (can't regain hit points)", "magical from 'magic'", "slow effects over 24 hours ignored"],
+		"tests": ["the monster's own catalogue effect (mummy rot) over a generic one", "magical from 'magic'", "slow effects over 24 hours left to the effect"],
 		"expected": {
 			"name": "Rotting Fist",
 			"reach": 5,
@@ -586,7 +586,7 @@
 					"effects": {
 						"on_fail": [
 							{
-								"effect": { "source": "srd", "source_key": "no-healing", "name": "No Healing" },
+								"effect": { "source": "srd", "source_key": "mummy-rot", "name": "Mummy Rot" },
 								"duration": { "type": "cancelled" },
 								"magical": true
 							}
@@ -632,7 +632,7 @@
 							{
 								"effect": { "source": "srd", "source_key": "damage-over-time", "name": "Damage Over Time" },
 								"duration": { "type": "cancelled" },
-								"choices": { "damage_type": "fire", "value": "5" }
+								"choices": { "damage_type": "fire", "roll": { "dice_count": 1, "dice_type": 10 } }
 							}
 						]
 					}
@@ -647,7 +647,7 @@
 		"group": "actions",
 		"name": "Draining Swipe",
 		"desc": "Melee Attack Roll: +4, reach 5 ft. Hit: 5 (1d6 + 2) Necrotic damage, and the target's Strength score decreases by 1d4. The target dies if this reduces that score to 0. If a Humanoid is slain by this attack, a Shadow rises from the corpse 1d4 hours later. The reduction lasts until the target finishes a Short or Long Rest.",
-		"tests": ["ability score reduction: ability fixed, rolled value left open", "until a Short or Long Rest"],
+		"tests": ["Strength drain: the catalogue's Strength Drain, no choices", "until a Short or Long Rest"],
 		"expected": {
 			"name": "Draining Swipe",
 			"reach": 5,
@@ -659,9 +659,8 @@
 					"effects": {
 						"on_hit": [
 							{
-								"effect": { "source": "srd", "source_key": "ability-score-bonus", "name": "Ability Score Bonus" },
-								"duration": { "type": "rest", "rest_type": "short_or_long" },
-								"choices": { "ability": "strength" }
+								"effect": { "source": "srd", "source_key": "strength-drain", "name": "Strength Drain" },
+								"duration": { "type": "rest", "rest_type": "short_or_long" }
 							}
 						]
 					}

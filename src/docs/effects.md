@@ -45,9 +45,10 @@ shows its description and what it does, as in the Effects drawer.
   - **Bonuses**: Armor Class, attack rolls, damage rolls, saving throws, Initiative, Speed,
     spell save DC, spell attack, Passive Perception and Hit Point maximum ask for a number. A
     negative number is a penalty. A higher Hit Point maximum also raises current Hit Points.
-  - **Armor Class Minimum**, **Fly Speed** and **Hit Point Maximum Reduction** ask for a
-    number. **Damage Over Time** asks for a damage type and an amount, taken at the start of
-    each of the creature's turns.
+  - **Armor Class Minimum** and **Fly Speed** ask for a number. **Hit Point Maximum
+    Reduction** asks for a roll (dice like 1d10, a fixed number, or both), rolled once when
+    applied. **Damage Over Time** asks for a damage type and a roll, rolled at the start of each
+    of the creature's turns.
   - **Speed Halved**, **No Reactions**, **No Healing** (can't regain Hit Points: healing is
     blocked, with a notification) and **Magic Resistance** (Advantage on saves against spells
     and magical effects) need no choice.

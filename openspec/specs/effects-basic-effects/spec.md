@@ -15,7 +15,8 @@ The SRD effects data SHALL contain the basic effects below. None of them SHALL h
 `edition`, so each is available in campaigns of both editions. Each SHALL have one
 sub-effect, a `name`, and a `description` that says what is chosen when the effect is
 applied, if anything. A sub-effect's choices are listed after the arrow; "value" is a number,
-negative for a penalty.
+negative for a penalty; "roll" is dice, a fixed value, or both (`{ dice_count, dice_type,
+fixed_val }`).
 
 Bonuses (`bonus`):
 - `armor-class-bonus` "Armor Class Bonus": Armor Class → value
@@ -36,11 +37,13 @@ Bonuses (`bonus`):
 
 For monster actions and traits:
 - `hit-point-maximum-reduction` "Hit Point Maximum Reduction": `bonus` on Hit Point maximum
-  with `multiplier: -1` → value (the amount it is reduced by)
+  with `multiplier: -1` → roll (rolled once when applied: 1d10 from a disease, or a fixed
+  value such as the damage taken)
 - `no-healing` "No Healing": `cap` on `healing_received`, value 0 (no choice)
 - `speed-halved` "Speed Halved": `bonus` on Speed with `multiplier: 0.5` (no choice)
 - `no-reactions` "No Reactions": `restrict` Reactions (no choice)
-- `damage-over-time` "Damage Over Time": `damage` on `start_turn_target` → damage type, value
+- `damage-over-time` "Damage Over Time": `damage` on `start_turn_target` → damage type, roll
+  (rolled every turn)
 - `magic-resistance` "Magic Resistance": Advantage on saving throws whose source is magical
   (no choice)
 
@@ -69,6 +72,10 @@ Defenses:
 #### Scenario: Basic effects validate
 - **WHEN** the SRD data validation command is run
 - **THEN** every basic effect passes, and none has an `edition`
+
+#### Scenario: Damage over time rolls every turn
+- **WHEN** Damage Over Time is applied with damage type fire and roll 2d6
+- **THEN** the creature's start-of-turn prompt rolls 2d6 fire each turn
 
 ### Requirement: No Healing blocks regaining hit points
 
